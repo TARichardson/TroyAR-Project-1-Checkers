@@ -5,8 +5,12 @@ This is a basic game of the checkers board game, American checkers. Using rules 
 
 ## An explanation of the major problems you plan to face while implementing this game.
   - the jumping the opponent.
+  - the Crowning the the checker.
+  - multi-jumps.
 ## An explanation of how you foresee yourself solving the aforementioned problems.
   - depending on the direction the piece is going the location on the board will hold possibles jumps from that spot.
+  - the crowned piece will need to move in both direction. I will store a bool to let the move logic know to let the crowned piece move and jump in both direction.
+  - should it be auto after the 1st jump, because the rules said you must take all possibles jumps.
 
 
 ### Specifications
