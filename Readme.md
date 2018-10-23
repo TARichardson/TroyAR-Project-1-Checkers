@@ -3,20 +3,18 @@
 _Introduction_
 This is a basic game of the checkers board game, American checkers. Using rules from the website https://www.itsyourturn.com/t_helptopic2030.html. Tutorial Section:
 
-## An explanation of the major problems you plan to face while implementing this game.
-  - the jumping the opponent.
-  - the Crowning the the checker.
-  - multi-jumps.
-## An explanation of how you foresee yourself solving the aforementioned problems.
-  - depending on the direction the piece is going the location on the board will hold possibles jumps from that spot.
-  - the crowned piece will need to move in both direction. I will store a bool to let the move logic know to let the crowned piece move and jump in both direction.
-  - should it be auto after the 1st jump, because the rules said you must take all possibles jumps.
+## Project Risks.
+  - The jumping the opponent.
+  - The Crowning the the checker.
+  - Multi-jumps.
+## solving.
+  - Depending on the direction the piece is going the location on the board will hold possibles jumps from that spot.
+  - The crowned checker piece will need to move in both direction. I will store a bool to let the move logic know to let the crowned piece move and jump in both direction.
+  - Should it be auto after the 1st jump, because the rules said you must take all possibles jumps.
 
 
 ### Specifications
-- start button > select what color you want.
-- a the player will get a message "invalid move Player#".
-- message using the DOM
+- Start button > select what color you want.
 - Setup Board: needs 32x32 board - 32 dark squares.
 - 2 players needed: with 12 pieces each on 3 rows each the player's side.
 - player pieces: 'red' or 'black' color.
@@ -35,6 +33,8 @@ This is a basic game of the checkers board game, American checkers. Using rules 
 - valid jump rule: If you have a valid jump, you must jump.
 - invalid move - is when a player clicks on any non-open -spot and no jump possibles are available.
 - invalid jump - the next space beyond the opponent is not empty when jumping.
+- The player will get a message "invalid move Player#" when make invalid moves.
+- Message using the DOM
 - Crowning 3a: When one of your checkers reaches the opposite side of the board, it is crowned and become a king. Your turn ends when kinged.
 - Crowning 3b: A king can move backward and forward one space at a time.
 
