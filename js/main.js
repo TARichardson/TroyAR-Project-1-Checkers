@@ -5,19 +5,20 @@
 /////////////////////////////////////////////////
 /////////// Model
 
-
 class Pieces {
   constructor(id){
     this._id=         id;     // player id may not be needed
     this._king=       false;  // king has different move logic
-    this._location=   String;    //'A0' // location on board.
-    this._direction=  id;    // are your pieces moving 'up' = 1, 'down' = 2, or 'both' = 3 on the board.
+    this._location=   String; //'A0' // location on board.
+    this._direction=  id;     // are your pieces moving 'up' = 1, 'down' = 2, or 'both' = 3 on the board.
     this._captured=   false;  // if captured that pieces is removed from the board.
   }
 }
 const colCheckers = ['black','red'];
-const maxPlayers = 2; // per game
-const maxPieces = 12; // per player.
+const maxPlayers = 2;     // per game
+const maxPieces = 12;     // per player.
+const maxBoardSize = 8;   // 8x8 = 64
+const utfA = 65;          // UTF-16 'A'
 class Player {
   constructor(id, name, color) {
     this._id = id;              // player id will be use on the internal board
@@ -30,37 +31,60 @@ class Player {
     }
   }
 }
+const fillArr = ( val, size) =>{
+  let tempArr = [];
+  for(let i = 0; i < size; i += 1){
+    tempArr[i] = val;
+  }
+  return tempArr;
+}
 
-// class GameBoard {
+class GameBoard {
+  constructor(size){
+    this._board = {};
+    for(let i = 0; i < size; i += 1)
+      Object.defineProperty(this._board, String.fromCharCode(utfA + i),{
+      value: fillArr(0,size),
+      writable: true
+    });
+  }
+      // const object1 = {};
+      //
+      // Object.defineProperty(object1, 'property1', {
+      //   value: 42,
+      //   writable: false
+      // });
+
 //   A:[0,0,0];
 //   B:[0,0,0];
 //   C:[0,0,0];
-// }
+}
 
 class GameState {
-  static get _instance () {    // Create a singleton
-    return this;
-  }
+   // Create a singleton
   constructor() {
-
-    // if created return the instance
-    if(typeof this._instance == "object")
+    // if there is no instance of class make one
+    if(!GameState._instance)
     {
-      console.log("same");
-      return this._instance;
+      // create the GameState obj
+      this._instance = this;
+      this._gameRunning = true;
+      this._winner = false;
+      this._p1Turn = true;       // true if player 1 turn, false if player 2 turn.
+      this._player = [maxPlayers];
+      for(let i = 0; i < maxPlayers; i += 1){
+        let id = i + 1;
+        this._player[i] = new Player( id,`Player ${id}` , colCheckers[i]);
+      }
+      this._gameBoard = new GameBoard(maxBoardSize)
+
+      GameState._instance =  this;
     }
-    // else create the GameState obj
-    this._instance = this;
-    this._gameRunning = true;
-    this._winner = false;
-    this._p1Turn = true;       // true if player 1 turn, false if player 2 turn.
-    this._player = [maxPlayers];
-    for(let i = 0; i < maxPlayers; i += 1){
-      let id = i + 1;
-      this._player[i] = new Player( id,`Player ${id}` , colCheckers[i]);
+    else{
+      console.log("same class"); // for testing delete later.
     }
 
-    return this._instance;
+    return GameState._instance;
 
   }
 
@@ -73,6 +97,18 @@ const gameUpdate = () => {
   }
 }
 
+const gameState = new GameState();
+// freeze its methods from being changed, prevent new methods or properties from being added.
+Object.freeze(gameState);
+
+console.log('A'.charCodeAt());
+console.log('B'.charCodeAt());
+console.log('C'.charCodeAt());
+console.log('D'.charCodeAt());
+console.log(String.fromCharCode(65));
+console.log(String.fromCharCode(66));
+console.log(String.fromCharCode(67));
+console.log(String.fromCharCode(68));
 /////////////////////////////////////////////////
 ////////// Control
 
