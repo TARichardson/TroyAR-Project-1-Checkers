@@ -32,19 +32,21 @@ class Player {
   }
 }
 
-const fillBoardSpots = ( spot, size) => {
-  let tempArr = [];
-  for(let index = 0; index < size; index += 1) {
+const spot = { // object template
+  id: String,
+  checkerId: Number,
+  isEmpty: true,
+  topSpots: [],
+  bottomSpots: []
+};
 
-    if(spot.id.length == 2){
-      spot.id[1] = index;
-    }
-    else{
-      spot.id += index;
-    }
-    tempArr[index] = spot;
+const fillBoardSpots = ( index, size) => {
+  let tempArr = [];
+  for(let j = 0; j < size; j += 1) {
+    let tempObj = Object.create(spot);
+    tempObj.id = String.fromCharCode(utfA + index) + j;
+    tempArr[j] = tempObj;
   }
-  tempArr[0].id = "first index";
   return tempArr;
 }
 
@@ -53,19 +55,17 @@ const resetBoardSpots = () => {
   console.log("in reset board spot");
 }
 
+
+
 class GameBoard {
   constructor(size){
-    this._board = {};
+    this._board = [];
     for(let i = 0; i < size; i += 1){
       let key = String.fromCharCode(utfA + i);
-      Object.defineProperty(this._board, key,{
-      value: fillBoardSpots({
-        id: key,
-        checkerId: Number,
-        isEmpty: true,
-        topSpots: [],
-        bottomSpots: [],
-      },size),
+      //let tempObj = Object.create(spot);
+      Object.defineProperty(this._board, key,
+        {
+      value: fillBoardSpots(i ,size),
       writable: true
     });
   }
