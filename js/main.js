@@ -5,7 +5,7 @@
 /////////////////////////////////////////////////
 /////////// Model
 
-class Pieces {
+class Piece {
   constructor(id){
     this._id=         id;     // player id may not be needed
     this._king=       false;  // king has different move logic
@@ -27,39 +27,50 @@ class Player {
     this._score = 0;            // pieces captured from opponent
     this._pieces = [maxPieces];  // has the 12 pieces
     for(let i = 0; i < maxPieces; i += 1){
-      this._pieces[i] = new Pieces(this._id);
+      this._pieces[i] = new Piece(this._id);
     }
   }
 }
-const fillArr = ( val, size) =>{
+
+const fillBoardSpots = ( spot, size) => {
   let tempArr = [];
-  for(let i = 0; i < size; i += 1){
-    tempArr[i] = val;
+  for(let index = 0; index < size; index += 1) {
+
+    if(spot.id.length == 2){
+      spot.id[1] = index;
+    }
+    else{
+      spot.id += index;
+    }
+    tempArr[index] = spot;
   }
+  tempArr[0].id = "first index";
   return tempArr;
+}
+
+const resetBoardSpots = () => {
+
+  console.log("in reset board spot");
 }
 
 class GameBoard {
   constructor(size){
     this._board = {};
-    for(let i = 0; i < size; i += 1)
-      Object.defineProperty(this._board, String.fromCharCode(utfA + i),{
-      value: fillArr(0,size),
+    for(let i = 0; i < size; i += 1){
+      let key = String.fromCharCode(utfA + i);
+      Object.defineProperty(this._board, key,{
+      value: fillBoardSpots({
+        id: key,
+        checkerId: Number,
+        isEmpty: true,
+        topSpots: [],
+        bottomSpots: [],
+      },size),
       writable: true
     });
   }
-      // const object1 = {};
-      //
-      // Object.defineProperty(object1, 'property1', {
-      //   value: 42,
-      //   writable: false
-      // });
-
-//   A:[0,0,0];
-//   B:[0,0,0];
-//   C:[0,0,0];
 }
-
+}
 class GameState {
    // Create a singleton
   constructor() {
@@ -71,10 +82,10 @@ class GameState {
       this._gameRunning = true;
       this._winner = false;
       this._p1Turn = true;       // true if player 1 turn, false if player 2 turn.
-      this._player = [maxPlayers];
+      this._players = [maxPlayers];
       for(let i = 0; i < maxPlayers; i += 1){
         let id = i + 1;
-        this._player[i] = new Player( id,`Player ${id}` , colCheckers[i]);
+        this._players[i] = new Player( id,`Player ${id}` , colCheckers[i]);
       }
       this._gameBoard = new GameBoard(maxBoardSize)
 
@@ -101,14 +112,6 @@ const gameState = new GameState();
 // freeze its methods from being changed, prevent new methods or properties from being added.
 Object.freeze(gameState);
 
-console.log('A'.charCodeAt());
-console.log('B'.charCodeAt());
-console.log('C'.charCodeAt());
-console.log('D'.charCodeAt());
-console.log(String.fromCharCode(65));
-console.log(String.fromCharCode(66));
-console.log(String.fromCharCode(67));
-console.log(String.fromCharCode(68));
 /////////////////////////////////////////////////
 ////////// Control
 
