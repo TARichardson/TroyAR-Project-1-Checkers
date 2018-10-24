@@ -69,15 +69,38 @@ class GameBoard {
       tempObj.id = String.fromCharCode(utfA + index) + j;
       tempObj.checkerId =     [-1,-1],
       tempObj.isEmpty =       true,
-      tempObj.topSpots =      [],
-      tempObj.bottomSpots =   []
+      tempObj.topSpots =      ['none','none'],
+      tempObj.bottomSpots =   ['none','none']
       tempArr[j] = tempObj;
     }
     return tempArr;
   }
 
   // fill out the jumps for each spot.
-  createJumps() {}
+  createJumps() {
+    for(let offset = 0; offset < maxBoardSize; offset += 1) {
+      for(let j = 0; j < maxBoardSize; j += 1) {
+        let key = String.fromCharCode(utfA + offset);
+        let leftCheck = (utfA + (offset - 1));
+        let rightCheck = (utfA + (offset + 1));
+        let topCheck = j-1;
+        let bottomCheck = j+1;
+
+        if(leftCheck >= utfA) {
+          let leftKey = String.fromCharCode(leftCheck);
+        }
+        if(rightCheck <= utfA ) {
+          let rightKey = String.fromCharCode(rightCheck);
+        }
+
+        // top spots to move
+        this._board[key][j];
+        // bottom spots to move
+        this._board[key][j];
+
+      }
+    }
+  }
 
   setBoard(Player1Arr, Player2Arr) {
       let pieceCounter = 0;
@@ -91,7 +114,7 @@ class GameBoard {
           if( (j + 1) % 2 != 0 && (offset + 1) % 2 != 0)  {
             this._board[keyABC][j].checkerId =     [Player2Arr[pieceCounter]._id,pieceCounter];
             this._board[keyABC][j].isEmpty =       false;
-            Player2Arr[pieceCounter]._location =              keyABC + j; //'A0' // location on board.
+            Player2Arr[pieceCounter]._location =   keyABC + j; //'A0' // location on board.
             pieceCounter++;
           }
 
@@ -99,7 +122,7 @@ class GameBoard {
             // place in row2 if evens.
             this._board[keyABC][j].checkerId =      [Player2Arr[pieceCounter]._id,pieceCounter];
             this._board[keyABC][j].isEmpty =        false;
-            Player2Arr[pieceCounter]._location =               keyABC + j; //'A0' // location on board.
+            Player2Arr[pieceCounter]._location =    keyABC + j; //'A0' // location on board.
             pieceCounter++;
           }
         }
@@ -115,14 +138,14 @@ class GameBoard {
           if( (j + 1) % 2 != 0 && (offset + 1) % 2 != 0)  {
             this._board[keyFGH][j].checkerId =      [Player1Arr[pieceCounter]._id,pieceCounter];
             this._board[keyFGH][j].isEmpty =        false;
-            Player1Arr[pieceCounter]._location =          keyFGH + j;
+            Player1Arr[pieceCounter]._location =    keyFGH + j;
             pieceCounter++;
           }
           // place in row6 & row8 if evens.
           if( (j + 1) % 2 == 0 && (offset + 1) % 2 == 0)  {
             this._board[keyFGH][j].checkerId =     [Player1Arr[pieceCounter]._id,pieceCounter];
             this._board[keyFGH][j].isEmpty =       false;
-            Player1Arr[pieceCounter]._location =             keyFGH + j;
+            Player1Arr[pieceCounter]._location =   keyFGH + j;
             pieceCounter++;
           }
       }
@@ -142,11 +165,13 @@ class GameBoard {
   }
 
   // send back a array of possible move or jumps from location
-  actionPossible(id, fromLo){}
+  actionPossible(id, fromLo) {}
   // send back array of move
-  jumpTo(id, fromLoc, toLoc){}
+  jumpTo(id, fromLoc, toLoc) {}
   // move pieces
-  moveTo(id, fromLoc, toLoc){}
+  moveTo(id, fromLoc, toLoc) {
+
+  }
 
 }
 class GameState {

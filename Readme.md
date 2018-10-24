@@ -105,3 +105,6 @@ This is a basic game of the checkers board game, American checkers. Using rules 
   }
 }
 ```
+Log
+------------ | -------------
+Oct 24 2018 | fill out the jumps for each spot. Move pieces on board. jumping
