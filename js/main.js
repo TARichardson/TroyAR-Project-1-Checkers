@@ -34,7 +34,7 @@ class Player {
 
 const spot = { // object template
   id: String,
-  checkerId: -1,
+  checkerId: [-1,-1],
   isEmpty: true,
   topSpots: [],
   bottomSpots: []
@@ -42,17 +42,17 @@ const spot = { // object template
 
 
 class GameBoard {
-  constructor(size){
+  constructor(BoardSize){
     // if there is no instance of class make one
     if(!GameBoard._instance)
     {
       this._board = [];
-      for(let i = 0; i < size; i += 1){
+      for(let i = 0; i < BoardSize; i += 1){
         let key = String.fromCharCode(utfA + i);
         //let tempObj = Object.create(spot);
         Object.defineProperty(this._board, key,
           {
-        value: this.fillBoardSpots(i ,size),
+        value: this.fillBoardSpots(i ,BoardSize),
         writable: true
         });
       }
@@ -62,12 +62,12 @@ class GameBoard {
     return GameBoard._instance;
   }
 
-  fillBoardSpots( index, size) {
+  fillBoardSpots( index, BoardSize) {
     let tempArr = [];
-    for(let j = 0; j < size; j += 1) {
+    for(let j = 0; j < BoardSize; j += 1) {
       let tempObj = Object.create(spot);
       tempObj.id = String.fromCharCode(utfA + index) + j;
-      tempObj.checkerId =     -1,
+      tempObj.checkerId =     [-1,-1],
       tempObj.isEmpty =       true,
       tempObj.topSpots =      [],
       tempObj.bottomSpots =   []
@@ -75,6 +75,9 @@ class GameBoard {
     }
     return tempArr;
   }
+
+  // fill out the jumps for each spot.
+  createJumps() {}
 
   setBoard(Player1Arr, Player2Arr) {
       let pieceCounter = 0;
@@ -86,17 +89,15 @@ class GameBoard {
 
           // place in row1  and row3 if odds.
           if( (j + 1) % 2 != 0 && (offset + 1) % 2 != 0)  {
-            console.log("we are in odd.");
-            this._board[keyABC][j].checkerId =     j;
+            this._board[keyABC][j].checkerId =     [Player2Arr[pieceCounter]._id,pieceCounter];
             this._board[keyABC][j].isEmpty =       false;
             Player2Arr[pieceCounter]._location =              keyABC + j; //'A0' // location on board.
             pieceCounter++;
           }
 
           if( (j + 1) % 2 == 0 && (offset + 1) % 2 == 0)  {
-            console.log("we are in even.");
             // place in row2 if evens.
-            this._board[keyABC][j].checkerId =      j;
+            this._board[keyABC][j].checkerId =      [Player2Arr[pieceCounter]._id,pieceCounter];
             this._board[keyABC][j].isEmpty =        false;
             Player2Arr[pieceCounter]._location =               keyABC + j; //'A0' // location on board.
             pieceCounter++;
@@ -112,14 +113,14 @@ class GameBoard {
 
           // place in row7 if odds.
           if( (j + 1) % 2 != 0 && (offset + 1) % 2 != 0)  {
-            this._board[keyFGH][j].checkerId =      offset;
+            this._board[keyFGH][j].checkerId =      [Player1Arr[pieceCounter]._id,pieceCounter];
             this._board[keyFGH][j].isEmpty =        false;
             Player1Arr[pieceCounter]._location =          keyFGH + j;
             pieceCounter++;
           }
           // place in row6 & row8 if evens.
           if( (j + 1) % 2 == 0 && (offset + 1) % 2 == 0)  {
-            this._board[keyFGH][j].checkerId =     j;
+            this._board[keyFGH][j].checkerId =     [Player1Arr[pieceCounter]._id,pieceCounter];
             this._board[keyFGH][j].isEmpty =       false;
             Player1Arr[pieceCounter]._location =             keyFGH + j;
             pieceCounter++;
@@ -130,17 +131,22 @@ class GameBoard {
 
 
   resetBoardSpots(Player1Arr, Player2Arr) {
-    let size = Player1Arr.length;
     for(let i = 0; i < maxBoardSize; i += 1){
       for(let j = 0; j < maxBoardSize; j += 1) {
         let key = String.fromCharCode(utfA + i);
-        this._board[key][j].checkerId =     Number;
+        this._board[key][j].checkerId =     [-1,-1];
         this._board[key][j].isEmpty =       true;
       }
     }
     this.setBoard(Player1Arr,Player2Arr);
   }
 
+  // send back a array of possible move or jumps from location
+  actionPossible(id, fromLo){}
+  // send back array of move
+  jumpTo(id, fromLoc, toLoc){}
+  // move pieces
+  moveTo(id, fromLoc, toLoc){}
 
 }
 class GameState {
