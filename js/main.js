@@ -178,10 +178,97 @@ class GameBoard {
     this.setBoard(Player1Arr,Player2Arr);
   }
 
-  // send back a array of possible move or jumps from location
-  actionPossible(id, fromLo) {}
-  // send back array of move
-  jumpTo(id, fromLoc, toLoc) {}
+  // send back a array of possible jumps from location
+  possibleJumps(id, direction, fromLoc) {
+    let size = this._board[fromLoc[0]][fromLoc[1]].topSpots.length;
+
+    let tempArr = [];
+      if(direction == moveUp || direction == moveBoth) {
+        for(let i = 0; i < size; i += 1){
+          // find the top spot id
+          let checkId = this._board[fromLoc[0]][fromLoc[1]].topSpots[i]
+          if(checkId != 'none') {
+            if(!this._board[checkId[0]][checkId[1]].isEmpty
+               && id != this._board[checkId[0]][checkId[1]].checkerId) {
+                 let checkId2 = this._board[checkId[0]][checkId[1]].topSpots[i]
+                 if(checkId2 != 'none') {
+                   if(this._board[checkId2[0]][checkId2[1]].isEmpty) {
+                     tempArr.push(checkId2);
+                   }
+                 }
+            }
+          }
+        }
+      }
+      if (direction == moveDown || direction == moveBoth) {
+        for(let i = 0; i < size; i += 1){
+          // find the bottom spot id
+          let checkId = this._board[fromLoc[0]][fromLoc[1]].bottomSpots[i]
+          if(checkId != 'none') {
+            if(!this._board[checkId[0]][checkId[1]].isEmpty
+               && id != this._board[checkId[0]][checkId[1]].checkerId) {
+                 let checkId2 = this._board[checkId[0]][checkId[1]].bottomSpots[i]
+                 if(checkId2 != 'none') {
+                   if(this._board[checkId2[0]][checkId2[1]].isEmpty) {
+                     tempArr.push(checkId2);
+                   }
+                 }
+            }
+          }
+        }
+      }
+      return tempArr;
+  }
+  // send back a array of possible moves from location
+  possibleMoves(id, direction, fromLoc) {
+    let size = this._board[fromLoc[0]][fromLoc[1]].topSpots.length;
+
+    let tempArr = [];
+      if(direction == moveUp || direction == moveBoth) {
+        for(let i = 0; i < size; i += 1){
+          // find the top spot id
+          let checkId = this._board[fromLoc[0]][fromLoc[1]].topSpots[i]
+          if(checkId != 'none') {
+            if(this._board[checkId[0]][checkId[1]].isEmpty) {
+              tempArr.push(checkId);
+            }
+          }
+        }
+      }
+      if (direction == moveDown || direction == moveBoth) {
+        for(let i = 0; i < size; i += 1){
+          // find the bottom spot id
+          let checkId = this._board[fromLoc[0]][fromLoc[1]].bottomSpots[i]
+          if(checkId != 'none') {
+            if(this._board[checkId[0]][checkId[1]].isEmpty) {
+              tempArr.push(checkId);
+            }
+          }
+
+        }
+      }
+      return tempArr;
+  }
+  // jump checker piece
+  // return: true if jump was a success
+  //         false if piece wasn't moved
+  jumpTo(fromLoc, toLoc, reMove) {
+    try {
+      this._board[toLoc[0]][toLoc[1]].checkerId = this._board[fromLoc[0]][fromLoc[1]].checkerId;
+      this._board[toLoc[0]][toLoc[1]].isEmpty   = false;
+
+      this._board[fromLoc[0]][fromLoc[1]].checkerId = [-1,-1];
+      this._board[fromLoc[0]][fromLoc[1]].isEmpty = true;
+
+      this._board[reMove[0]][reMove[1]].checkerId = [-1,-1];
+      this._board[reMove[0]][reMove[1]].isEmpty = true;
+      return true;
+    }
+    catch{
+      return false;
+    }
+
+  }
 
   // valid Selection
   // return: true if player id  and checker id on the board match
@@ -200,8 +287,6 @@ class GameBoard {
     if(this._board[toLoc[0]][toLoc[1]].isEmpty){
       if(direction == moveUp) {
         for(let i = 0; i < size; i += 1){
-          console.log(id);
-          console.log(this._board[fromLoc[0]][fromLoc[1]].topSpots[i])
           if(id == this._board[fromLoc[0]][fromLoc[1]].topSpots[i]) {
             return true;
           }
@@ -230,9 +315,8 @@ class GameBoard {
   // move pieces
   // return: true if moved
   //         false if piece wasn't moved
-  moveTo(id, direction, fromLoc, toLoc) {
-    if(this.validSelection(id,this._board[fromLoc[0]][fromLoc[1]].checkerId)) { // is valid Selection?
-      if(this.validMove(direction, fromLoc, toLoc)) {
+  moveTo(fromLoc, toLoc) {
+    try{
         this._board[toLoc[0]][toLoc[1]].checkerId = this._board[fromLoc[0]][fromLoc[1]].checkerId;
         this._board[toLoc[0]][toLoc[1]].isEmpty   = false;
 
@@ -240,9 +324,10 @@ class GameBoard {
         this._board[fromLoc[0]][fromLoc[1]].isEmpty = true;
 
         return true;
-      } else return false;
-    }
-    else return false;
+      }
+      catch {
+         return false;
+       }
   }
 }
 
