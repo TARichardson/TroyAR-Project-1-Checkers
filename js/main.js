@@ -19,6 +19,10 @@ const maxPlayers = 2;     // per game
 const maxPieces = 12;     // per player.
 const maxBoardSize = 8;   // 8x8 = 64
 const utfA = 65;          // UTF-16 'A'
+const moveUp = 1;
+const moveDown = 2;
+const moveBoth = 3;
+
 class Player {
   constructor(id, name, color) {
     this._id = id;              // player id will be use on the internal board
@@ -81,23 +85,33 @@ class GameBoard {
     for(let offset = 0; offset < maxBoardSize; offset += 1) {
       for(let j = 0; j < maxBoardSize; j += 1) {
         let key = String.fromCharCode(utfA + offset);
-        let leftCheck = (utfA + (offset - 1));
-        let rightCheck = (utfA + (offset + 1));
-        let topCheck = j-1;
-        let bottomCheck = j+1;
+        let topCheck = (utfA + (offset - 1));
+        let bottomCheck = (utfA + (offset + 1));
+        let leftCheck = j-1;
+        let rightCheck = j+1;
 
-        if(leftCheck >= utfA) {
-          let leftKey = String.fromCharCode(leftCheck);
+        if(topCheck >= utfA) { // checking for the top of the board boundary
+          let topKey = String.fromCharCode(topCheck);
+          // left board boundary
+          if(leftCheck > -1){
+            this._board[key][j].topSpots[0] = this._board[topKey][leftCheck].id;
+          }
+          // right board boundary
+          if(rightCheck < maxBoardSize){
+            this._board[key][j].topSpots[1] = this._board[topKey][rightCheck].id;
+          }
         }
-        if(rightCheck <= utfA ) {
-          let rightKey = String.fromCharCode(rightCheck);
+        if(bottomCheck < utfA + maxBoardSize) { // checking for the bottom of the board boundary
+          let bottomKey = String.fromCharCode(bottomCheck);
+          // left board boundary
+          if(leftCheck > -1){
+            this._board[key][j].bottomSpots[0] = this._board[bottomKey][leftCheck].id;
+          }
+          // right board boundary
+          if(rightCheck < maxBoardSize){
+            this._board[key][j].bottomSpots[1] = this._board[bottomKey][rightCheck].id;
+          }
         }
-
-        // top spots to move
-        this._board[key][j];
-        // bottom spots to move
-        this._board[key][j];
-
       }
     }
   }
@@ -168,12 +182,70 @@ class GameBoard {
   actionPossible(id, fromLo) {}
   // send back array of move
   jumpTo(id, fromLoc, toLoc) {}
-  // move pieces
-  moveTo(id, fromLoc, toLoc) {
 
+  // valid Selection
+  // return: true if player id  and checker id on the board match
+  //         false if mismatch
+  validSelection(playerId, checkerId) {
+    return playerId == checkerId[0] ? true : false;
   }
 
+  // valid Move
+  // return: true if player move is valid
+  //         false if invalid move
+  validMove(direction,fromLoc, toLoc) {
+    let size = this._board[fromLoc[0]][fromLoc[1]].topSpots.length;
+    // spot id
+    let id = this._board[toLoc[0]][toLoc[1]].id
+    if(this._board[toLoc[0]][toLoc[1]].isEmpty){
+      if(direction == moveUp) {
+        for(let i = 0; i < size; i += 1){
+          console.log(id);
+          console.log(this._board[fromLoc[0]][fromLoc[1]].topSpots[i])
+          if(id == this._board[fromLoc[0]][fromLoc[1]].topSpots[i]) {
+            return true;
+          }
+        }
+      }
+      else if (direction == moveDown) {
+        for(let i = 0; i < size; i += 1){
+          if(id == this._board[fromLoc[0]][fromLoc[1]].bottomSpots[i]) {
+            return true;
+          }
+
+        }
+      }
+      else {
+        for(let i = 0; i < size; i += 1){
+          if(id == this._board[fromLoc[0]][fromLoc[1]].topSpots[i]
+            || id == this._board[fromLoc[0]][fromLoc[1]].bottomSpots[i]){
+              return true;
+            }
+        }
+      }
+    }
+    return false;
+  }
+
+  // move pieces
+  // return: true if moved
+  //         false if piece wasn't moved
+  moveTo(id, direction, fromLoc, toLoc) {
+    if(this.validSelection(id,this._board[fromLoc[0]][fromLoc[1]].checkerId)) { // is valid Selection?
+      if(this.validMove(direction, fromLoc, toLoc)) {
+        this._board[toLoc[0]][toLoc[1]].checkerId = this._board[fromLoc[0]][fromLoc[1]].checkerId;
+        this._board[toLoc[0]][toLoc[1]].isEmpty   = false;
+
+        this._board[fromLoc[0]][fromLoc[1]].checkerId = [-1,-1];
+        this._board[fromLoc[0]][fromLoc[1]].isEmpty = true;
+
+        return true;
+      } else return false;
+    }
+    else return false;
+  }
 }
+
 class GameState {
    // Create a singleton
   constructor() {
