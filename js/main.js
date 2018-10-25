@@ -1,6 +1,17 @@
 //////////////////////////////////////////////////
 ////////// Author - Troy A. Richardson
-//////////
+
+
+//////////  Global
+
+const colCheckers = ['black','red'];
+const maxPlayers = 2;     // per game
+const maxPieces = 12;     // per player.
+const maxBoardSize = 8;   // 8x8 = 64
+const utfA = 65;          // UTF-16 'A'
+const moveUp = 1;
+const moveDown = 2;
+const moveBoth = 3;       // Kings can move in both directions.
 
 /////////////////////////////////////////////////
 /////////// Model
@@ -14,14 +25,6 @@ class Piece {
     this._captured =   false;  // if captured that pieces is removed from the board.
   }
 }
-const colCheckers = ['black','red'];
-const maxPlayers = 2;     // per game
-const maxPieces = 12;     // per player.
-const maxBoardSize = 8;   // 8x8 = 64
-const utfA = 65;          // UTF-16 'A'
-const moveUp = 1;
-const moveDown = 2;
-const moveBoth = 3;
 
 class Player {
   constructor(id, name, color) {
@@ -368,15 +371,48 @@ const gameUpdate = () => {
   }
 }
 
+// our game state
 const gameState = new GameState();
 // freeze its methods from being changed, prevent new methods or properties from being added.
 Object.freeze(gameState);
-
-/////////////////////////////////////////////////
-////////// Control
-
 
 
 ////////////////////////////////////////////////
 ///////// View
 // tip use  "let src = elem.nodeValue;" research
+class GameDOM {
+  constructor() {
+    // if there is no instance of class make one
+    if(!GameDOM._instance) {
+      /// 
+
+      GameDOM._instance =  this;
+      Object.freeze(GameDOM._instance);
+    }
+    return GameDOM._instance;
+  }
+
+
+}
+
+// our game DOM
+const gameDOM = new GameDOM();
+// freeze its methods from being changed, prevent new methods or properties from being added.
+Object.freeze(gameDOM);
+
+
+const linkDOM = () => {
+
+}
+
+// if still loading
+if(document.readyState == "loading") {
+   document.addEventListener("DOMContentLoaded", linkDOM);
+}
+else { // else it's already loaded
+  linkDOM();
+}
+
+
+/////////////////////////////////////////////////
+////////// Control
