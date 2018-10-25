@@ -24,7 +24,7 @@ class Piece {
     this._direction =  id;     // are your pieces moving 'up' = 1, 'down' = 2, or 'both' = 3 on the board.
     this._captured =   false;  // if captured that pieces is removed from the board.
   }
-}
+};
 
 class Player {
   constructor(id, name, color) {
@@ -37,7 +37,7 @@ class Player {
       this._pieces[i] = new Piece(this._id);
     }
   }
-}
+};
 
 const spot = { // object template
   id: String,
@@ -67,7 +67,7 @@ class GameBoard {
       Object.freeze(GameBoard._instance);
     }
     return GameBoard._instance;
-  }
+  };
 
   fillBoardSpots( index, BoardSize) {
     let tempArr = [];
@@ -165,9 +165,9 @@ class GameBoard {
             Player1Arr[pieceCounter]._location =   keyFGH + j;
             pieceCounter++;
           }
+        }
       }
-    }
-}
+    };
 
 
   resetBoardSpots(Player1Arr, Player2Arr) {
@@ -179,7 +179,7 @@ class GameBoard {
       }
     }
     this.setBoard(Player1Arr,Player2Arr);
-  }
+  };
 
   // send back a array of possible jumps from location
   possibleJumps(id, direction, fromLoc) {
@@ -221,7 +221,9 @@ class GameBoard {
         }
       }
       return tempArr;
-  }
+  };
+
+
   // send back a array of possible moves from location
   possibleMoves(id, direction, fromLoc) {
     let size = this._board[fromLoc[0]][fromLoc[1]].topSpots.length;
@@ -251,7 +253,7 @@ class GameBoard {
         }
       }
       return tempArr;
-  }
+  };
   // jump checker piece
   // return: true if jump was a success
   //         false if piece wasn't moved
@@ -267,11 +269,11 @@ class GameBoard {
       this._board[reMove[0]][reMove[1]].isEmpty = true;
       return true;
     }
-    catch{
+    catch {
       return false;
     }
 
-  }
+  };
 
   // valid Selection
   // return: true if player id  and checker id on the board match
@@ -332,7 +334,19 @@ class GameBoard {
          return false;
        }
   }
-}
+
+  getSpotAt(fromLoc) {
+    try {
+      return this._board[fromLoc[0]][fromLoc[1]];
+    }
+    catch {
+      return false;
+    }
+
+  };
+
+  // end of class
+};
 
 class GameState {
    // Create a singleton
@@ -351,7 +365,7 @@ class GameState {
         this._players[i] = new Player( id,`Player ${id}` , colCheckers[i]);
       }
       this._gameBoard = new GameBoard(maxBoardSize)
-
+      this._gameBoard.createJumps();
       GameState._instance =  this;
     }
     else{
@@ -360,17 +374,33 @@ class GameState {
 
     return GameState._instance;
 
-  }
+  };
 
+  // Spot Info
+  // return: Array
+  //        = [ playerId, color]
+ spotInfo(Id) {
+   debugger;
+   let infoArr = [];
+   let tempSpot = this._gameBoard.getSpotAt(Id);
+   try {
+     infoArr[0] = tempSpot.checkerId[0];
+     infoArr[1] = this._players[ tempSpot.checkerId[0] -1]._color;
+     return infoArr;
+   }
+   catch {
+     return false;
+   }
+ };
  gameUpdate () {
    if(gameState.gameRunning){
      checkWin();
      displayGame();
     }
-  }
+  };
 
 
-}
+};
 
 // our game state
 const gameState = new GameState();
@@ -392,7 +422,7 @@ class GameDOM {
       //Object.freeze(GameDOM._instance);
     }
     return GameDOM._instance;
-  }
+  };
 
   loadElements() {
     // basic
@@ -405,24 +435,26 @@ class GameDOM {
     // Player score
     this._P1Name = document.querySelector('#P1');
     this._P2Name = document.querySelector('#P2');
+    // init game State board
+    gameState._gameBoard.setBoard(gameState._players[0]._pieces, gameState._players[1]._pieces);
 
-  }
+  };
 
   set p1Name(value) {
     this._P1Name = value;
-  }
+  };
 
   set p2Name(value) {
     this._P2Name = value;
-  }
+  };
 
   set p1Score(value) {
     this._P1Score = value;
-  }
+  };
 
   set p2Score(value) {
     this._P2Score = value;
-  }
+  };
   set boardInner(value) {
     this._board.innerHTML = value;
   }
@@ -431,6 +463,23 @@ class GameDOM {
   }
 
   displayGame() {
+
+    let spots = document.querySelectorAll('.spot');
+    for(let i = 0 ; i < spots.length; i += 1){
+      let spotId = spots[i].getAttribute('value');
+      let sInfo = gameState.spotInfo(spotId);// = [ playerId, color]
+      debugger;
+      if(sInfo)
+      {
+        let tempSpotDiv = document.createElement('div');
+        tempSpotDiv.setAttribute('class',sInfo[1]);
+
+        spots[i].innerHTML = '';
+        spots[i].appendChild( tempSpotDiv);
+        console.log( tempSpotDiv);
+      }
+
+    }
 
   }
 
@@ -446,7 +495,7 @@ class GameDOM {
     // create numbers for the Legend
     for(let i = 0; i < maxBoardSize+1; i += 1){
       let tempSpotDiv = document.createElement('div');
-      tempSpotDiv.setAttribute('class','L' +' spot');
+      tempSpotDiv.setAttribute('class','L' +' lSpot');
 
       if( i > 0)
       {
@@ -488,7 +537,12 @@ class GameDOM {
       }
       this.boardAppend = tmpRow;
     }
+    this.displayGame();
   }
+
+
+
+// end of class
 }
 
 // our game DOM

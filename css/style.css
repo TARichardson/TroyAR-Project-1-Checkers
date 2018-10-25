@@ -1,9 +1,42 @@
+main {
+  width: 100vw;
+  height: 100vh;
+   display: grid;
+   grid-template-areas:
+   'top top top top'
+   'lcol bo bo rcol'
+   'lcol bo bo rcol'
+   'fot fot fot fot'
+}
+
+#Lcol {
+  grid-area: lcol;
+  border: red .1em solid;
+
+}
+#Rcol {
+  grid-area: rcol;
+  border: red .1em solid;
+
+}
+header {
+  grid-area: top;
+  border: red .1em solid;
+
+}
+footer {
+  grid-area: fot;
+  border: red .1em solid;
+
+
+}
 #board {
     width: 500px;
     height: 500px;
     border: red .1em solid;
     display: flex;
     flex-direction: column;
+    grid-area: bo;
 }
 
 .Row{
@@ -12,7 +45,18 @@
   flex: auto;
     /* width: 100em; */
   }
-.L, .spot{
+.L, .spot, .lSpot{
   border: green .1em solid;
   flex: 30%;
+}
+
+.red {
+  width: inherit;
+  height: .5em;
+  background-color: red;
+}
+.black {
+  width: inherit;
+  height: .5em;
+  background-color: black;
 }
