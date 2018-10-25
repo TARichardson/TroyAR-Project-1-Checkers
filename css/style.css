@@ -1,0 +1,18 @@
+#board {
+    width: 500px;
+    height: 500px;
+    border: red .1em solid;
+    display: flex;
+    flex-direction: column;
+}
+
+.Row{
+  border: blue .1em solid;
+  display: flex;
+  flex: auto;
+    /* width: 100em; */
+  }
+.L, .spot{
+  border: green .1em solid;
+  flex: 30%;
+}

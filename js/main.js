@@ -362,13 +362,14 @@ class GameState {
 
   }
 
-}
-
-const gameUpdate = () => {
-  if(gameState.gameRunning){
-    checkWin();
-    displayGame();
+ gameUpdate () {
+   if(gameState.gameRunning){
+     checkWin();
+     displayGame();
+    }
   }
+
+
 }
 
 // our game state
@@ -384,25 +385,122 @@ class GameDOM {
   constructor() {
     // if there is no instance of class make one
     if(!GameDOM._instance) {
-      /// 
+      ///
+      this._body = document.body;
 
       GameDOM._instance =  this;
-      Object.freeze(GameDOM._instance);
+      //Object.freeze(GameDOM._instance);
     }
     return GameDOM._instance;
   }
 
+  loadElements() {
+    // basic
+    this._body = document.querySelector('body');
+    this._title = document.querySelector('#title');
+    this._board = document.querySelector('#board');
+    // Player Name
+    this._P1Score = document.querySelector('#P1Num');
+    this._P2Score = document.querySelector('#P2Num');
+    // Player score
+    this._P1Name = document.querySelector('#P1');
+    this._P2Name = document.querySelector('#P2');
 
+  }
+
+  set p1Name(value) {
+    this._P1Name = value;
+  }
+
+  set p2Name(value) {
+    this._P2Name = value;
+  }
+
+  set p1Score(value) {
+    this._P1Score = value;
+  }
+
+  set p2Score(value) {
+    this._P2Score = value;
+  }
+  set boardInner(value) {
+    this._board.innerHTML = value;
+  }
+  set boardAppend(value) {
+    this._board.appendChild(value);
+  }
+
+  displayGame() {
+
+  }
+
+  input() {
+
+
+  }
+
+  createBoard() {
+    // legend Row
+    let tmpRowL = document.createElement('div');
+    tmpRowL.setAttribute('class','Row');
+    // create numbers for the Legend
+    for(let i = 0; i < maxBoardSize+1; i += 1){
+      let tempSpotDiv = document.createElement('div');
+      tempSpotDiv.setAttribute('class','L' +' spot');
+
+      if( i > 0)
+      {
+        tempSpotDiv.innerHTML = i-1;
+        tempSpotDiv.setAttribute('value', i-1);
+      }
+      else {
+        tempSpotDiv.innerHTML = "";
+        tempSpotDiv.setAttribute('value', 'none');
+      }
+      tmpRowL.appendChild(tempSpotDiv);
+    }
+
+    this.boardAppend = tmpRowL;
+
+    // Row Container
+    for(let offset = 0; offset < maxBoardSize; offset += 1) {
+      let key = String.fromCharCode(utfA + offset);
+
+      let tmpRow = document.createElement('div');
+      tmpRow.setAttribute('class','Row');
+
+      let tmpLeg = document.createElement('div');
+      tmpLeg.setAttribute('class','L' + ` ${key}`);
+      tmpLeg.innerHTML = key;
+
+      tmpRow.appendChild(tmpLeg);
+
+      // row spot
+      for(let i = 0; i < maxBoardSize; i += 1){
+        let tempSpotDiv = document.createElement('div');
+        tempSpotDiv.setAttribute('class', key + ' spot');
+        tempSpotDiv.setAttribute('value', key + i);
+        //Temp Code
+        tempSpotDiv.innerHTML = key + i;
+        //////
+        tmpRow.appendChild(tempSpotDiv);
+        //tempRowA.addEventListener('click', placeMark);
+      }
+      this.boardAppend = tmpRow;
+    }
+  }
 }
 
 // our game DOM
 const gameDOM = new GameDOM();
-// freeze its methods from being changed, prevent new methods or properties from being added.
-Object.freeze(gameDOM);
+
 
 
 const linkDOM = () => {
-
+  gameDOM.loadElements();
+  gameDOM.createBoard();
+  // freeze its methods from being changed, prevent new methods or properties from being added.
+  Object.freeze(gameDOM);
 }
 
 // if still loading
