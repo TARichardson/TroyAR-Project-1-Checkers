@@ -445,6 +445,7 @@ class GameDOM {
     this._input = 0;
     this._spotsSel=[];
     this._possbSel=[];
+    this._jumpMove= true; // jump = true move = false
     // init game State board
     gameState._gameBoard.setBoard(gameState._players[0]._pieces, gameState._players[1]._pieces);
 
@@ -472,10 +473,18 @@ class GameDOM {
     this._board.appendChild(value);
   }
   set addSel(value) {
+    let checker = this.domGetGet(value);
+    debugger;
+    checker.setAttribute('class', checker.getAttribute('class')
+    + ' highlight');
     this._spotsSel.push(value);
   }
 
   set addPossb(value) {
+    let checker = this.domGetGet(value);
+    debugger;
+    checker.setAttribute('class', checker.getAttribute('class')
+    + ' possible');
     this._possbSel.push(value);
   }
 
@@ -505,6 +514,20 @@ class GameDOM {
     }
     return false;
   }
+  domGetGet(value) {
+    let data = this.domGetCheckerAt(value);
+    if(data){
+      return data;
+    }
+    else{
+      data = this.domGetSpotAt(value);
+      if(data){
+        return data;
+      }
+      return false;
+    }
+  }
+
   clearSel() {
     let spots = document.querySelectorAll('.highlight');
     try {
@@ -539,9 +562,21 @@ class GameDOM {
     }
   }
 
+  // is Possible
+  // return true if in possible move Array
+  //        false if not in possible move Array
+  isPossb(value) {
+    for(let i = 0 ; i < this._possbSel.length; i += 1){
+      if(value == this._possbSel[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   displayGame() {
     let spots = document.querySelectorAll('.spot');
-    for(let i = 0 ; i < spots.length; i += 1){
+    for(let i = 0 ; i < spots.length; i += 1) {
       let spotId = spots[i].getAttribute('value');
       let sInfo = gameState.spotInfo(spotId);// = [ playerId, color]
       if(sInfo)
@@ -555,6 +590,17 @@ class GameDOM {
 
     }
 
+    let score1 = document.querySelector('#P1Num');
+    let score2 = document.querySelector('#P2Num');
+    score1.innerHTML = gameState._players[0]._score;
+    score2.innerHTML = gameState._players[1]._score;
+
+    let play1 = document.querySelector('#P1');
+    let play2 = document.querySelector('#P2');
+    play1.innerHTML = gameState._players[0]._name;
+    play2.innerHTML = gameState._players[1]._name;
+
+
   }
 
   processInput () {
@@ -564,14 +610,39 @@ class GameDOM {
       case 1:
       console.log('in case 1');
         // do something
+        if(!this.possb.length){
+          let spot = gameState._gameBoard.getSpotAt(this.sel[0]);
+          let che;
+          che = gameState._players[spot.checkerId[0] - 1]._pieces[spot.checkerId[1]];
+          let tmpArr = gameState._gameBoard.possibleMoves(che._id,che._direction,this.sel[0]);
+          for(let i = 0; i < tmpArr.length; i += 1) {
 
+            this.addPossb = tmpArr[i];
+          }
+        }
         break;
       case 2:
       console.log('in case 2');
 
-        if(this.sel[0] != this.sel[1]) {
+        if(this.sel[0] != this.sel[1] && this.isPossb(this.sel[1])) {
           console.log('move to a new spot');
-          gameState._gameBoard.moveTo(this.sel[0],this.sel[1]);
+          if(this._jumpMove) {
+            if(gameState._gameBoard.jumpTo(this.sel[0],this.sel[1],this.sel[2] )) {
+
+              if(gameState._p1Turn){
+                gameState._players[0]._score += 1;
+                console.log('player 1 scored a point');
+              }
+              else {
+                gameState._players[1]._score += 1;
+                console.log('player 2 scored a point');
+              }
+            };
+          }
+          else {
+            gameState._gameBoard.moveTo(this.sel[0],this.sel[1]);
+            this._jumpMove = true;
+          }
           debugger;
           this.clearSel();
           this.clearPossb();
@@ -583,20 +654,22 @@ class GameDOM {
             console.log('player 2 turn');
           }
           this._input = 0;
-          this.createBoard()
+          this.createBoard();
           this.displayGame();
         }
         else if(this.sel[0] == this.sel[1]) {
-          debugger;
           this.clearSel();
           this.clearPossb();
           if(this.sel.length) {
             console.log('just deselect reselect element');
 
-            let checker = this.domGetCheckerAt(this.sel[0]);
-            checker.setAttribute('class', checker.getAttribute('class')
-            + ' highlight');
+            // let checker = this.domGetCheckerAt(this.sel[0]);
+            // checker.setAttribute('class', checker.getAttribute('class')
+            // + ' highlight');
             this._input = 1;
+            // to update Possb array
+            debugger;
+            this.processInput();
           }
           else {
             console.log('just deselect');
@@ -615,7 +688,6 @@ class GameDOM {
     let re = /spot/gi;
     let found = spotClass.match(re);
 
-    //debugger;
     // if a piece is there plus the player is the owner
     if( sInfo && (sInfo[0] == 1 && gameState._p1Turn)
     || (sInfo[0] == 2 && !gameState._p1Turn) ) {
@@ -632,13 +704,14 @@ class GameDOM {
 
         gameDOM.addSel = spotId;
         console.log(evt.target);
-        evt.target.setAttribute('class', evt.target.getAttribute('class')
-        + ' highlight');
+        // evt.target.setAttribute('class', evt.target.getAttribute('class')
+        // + ' highlight');
         gameDOM._input = gameDOM._input + 1;
       }
 
     }
     else if((found != null) && gameDOM._input == 1) { // it a spot
+      // todo : a check that checks the possible array
       gameDOM.addSel = spotId;
       console.log(evt.target);
       evt.target.setAttribute('class', evt.target.getAttribute('class')
@@ -650,7 +723,6 @@ class GameDOM {
     }
 
     gameDOM.processInput();
-    //gameDOM.displayGame();
   }
 
   createBoard() {

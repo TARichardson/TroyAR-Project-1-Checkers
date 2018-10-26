@@ -74,9 +74,7 @@ footer {
 }
 
 .spot+.highlight {
-  width: inherit;
-  height: inherit;
-  border: blue .1em solid;
+
 }
 .highlight {
   width: inherit;
@@ -85,8 +83,8 @@ footer {
 }
 .possible {
   width: inherit;
-  height: .5em;
-  border: lightblue .2em solid;
+  height: inherit;
+  border: lightblue .1em solid;
 }
 
 .checker {
