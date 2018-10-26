@@ -488,17 +488,21 @@ class GameDOM {
   }
 
   clearSel() {
-    for(let i = 0; i < this._spotsSel.length; i += 1) {
-      let spots = gameState.spotAt(this._spotsSel[i]);
-      //spots.removeAttribute('.highlight');
+    let spots = document.querySelectorAll('.highlight');
+    for(let i = 0; i < spots.length; i += 1) {
+      //spots.setAttribute(' highlight');
+      spots[i].setAttribute('class',
+               spots[i].getAttribute('class').replace(' highlight','') );
       this._spotsSel.pop();
     }
   }
 
   clearPossb() {
-    for(let i = 0; i < this._possbSel.length; i += 1) {
-      let spots = gameState.spotAt(this._possbSel[i]);
-      //spots.removeAttribute('.possible');
+    let spots = document.querySelectorAll('.possible');
+    for(let i = 0; i < spots.length; i += 1) {
+      //spots.setAttribute(' possible');
+      spots[i].setAttribute('class',
+               spots[i].getAttribute('class').replace(' possible','') );
       this._possbSel.pop();
     }
   }
@@ -534,12 +538,25 @@ class GameDOM {
       console.log('in case 2');
 
         if(this.sel[0] != this.sel[1]) {
+          console.log('move to a new spot');
+          gameState._gameBoard.moveTo(this.sel[0],this.sel[1]);
+          debugger;
           this.clearSel();
           this.clearPossb();
           gameState._p1Turn = !gameState._p1Turn;
+          if(gameState._p1Turn){
+            console.log('player 1 turn');
+          }
+          else {
+            console.log('player 2 turn');
+          }
           this._input = 0;
+          this.createBoard()
+          this.displayGame();
         }
         else if(this.sel[0] == this.sel[1]) {
+          console.log('just deselect');
+          debugger;
           this.clearSel();
           this.clearPossb();
           this._input = 0;
@@ -551,22 +568,44 @@ class GameDOM {
   input(evt) {
     let spotId = evt.target.getAttribute('value');
     let sInfo = gameState.spotInfo(spotId); // = [ playerId, color]
-    debugger;
+    let spotClass = evt.target.getAttribute('class');
+    let re = /spot/gi;
+    let found = spotClass.match(re);
+
+    //debugger;
     // if a piece is there plus the player is the owner
     if( sInfo && (sInfo[0] == 1 && gameState._p1Turn)
     || (sInfo[0] == 2 && !gameState._p1Turn) ) {
+      re = gameState._p1Turn ? /black/gi : /red/gi;
+      found = spotClass.match(re);
+      if((found != null) && gameDOM._input == 0) {
+
+
+        gameDOM.addSel = spotId;
+        console.log(evt.target);
+        evt.target.setAttribute('class', evt.target.getAttribute('class')
+        + ' highlight');
+        gameDOM._input = gameDOM._input + 1;
+      }
+
+    }
+    else if((found != null) && gameDOM._input == 1) { // it a spot
       gameDOM.addSel = spotId;
       console.log(evt.target);
       evt.target.setAttribute('class', evt.target.getAttribute('class')
       + ' highlight');
       gameDOM._input = gameDOM._input + 1;
     }
+    else {
+      console.log('error');
+    }
 
     gameDOM.processInput();
-    gameDOM.displayGame();
+    //gameDOM.displayGame();
   }
 
   createBoard() {
+    this.boardInner = '';
     // legend Row
     let tmpRowL = document.createElement('div');
     tmpRowL.setAttribute('class','Row');
