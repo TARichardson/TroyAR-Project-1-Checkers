@@ -11,52 +11,75 @@ main {
 
 #Lcol {
   grid-area: lcol;
-  border: red .1em solid;
+  /* border: red .1em solid; */
 
 }
 #Rcol {
   grid-area: rcol;
-  border: red .1em solid;
+  /* border: red .1em solid; */
 
 }
 header {
   grid-area: top;
-  border: red .1em solid;
+  /* border: red .1em solid; */
 
 }
 footer {
   grid-area: fot;
-  border: red .1em solid;
+  /* border: red .1em solid; */
 
 
 }
 #board {
     width: 500px;
     height: 500px;
-    border: red .1em solid;
+    /* border: red .1em solid; */
     display: flex;
     flex-direction: column;
     grid-area: bo;
 }
 
 .Row{
-  border: blue .1em solid;
+  /* border: blue .1em solid; */
   display: flex;
   flex: auto;
     /* width: 100em; */
   }
 .L, .spot, .lSpot{
-  border: green .1em solid;
+  /* border: green .1em solid; */
   flex: 30%;
 }
+.spot+.A:nth-child(odd), .B:nth-child(even),
+.spot+.C:nth-child(odd), .D:nth-child(even),
+.spot+.E:nth-child(odd), .F:nth-child(even),
+.spot+.G:nth-child(odd), .H:nth-child(even){
+  background-color: gray;
+  /* border: green .1em solid; */
 
+
+}
 .red {
   width: inherit;
   height: .5em;
   background-color: red;
+  position: relative;
+  top: 1.5em;
 }
 .black {
   width: inherit;
   height: .5em;
   background-color: black;
+  position: relative;
+  top: 1.5em;
+}
+
+.highlight {
+  width: inherit;
+  height: .5em;
+  border: blue .2em solid;
+}
+.possible {
+  width: inherit;
+  height: .5em;
+  border: lightblue .2 solid;
 }

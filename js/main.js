@@ -360,6 +360,8 @@ class GameState {
       this._winner = false;
       this._p1Turn = true;       // true if player 1 turn, false if player 2 turn.
       this._players = [maxPlayers];
+      this._fromPos = "";
+      this._toPos = "";
       for(let i = 0; i < maxPlayers; i += 1){
         let id = i + 1;
         this._players[i] = new Player( id,`Player ${id}` , colCheckers[i]);
@@ -380,7 +382,6 @@ class GameState {
   // return: Array
   //        = [ playerId, color]
  spotInfo(Id) {
-   debugger;
    let infoArr = [];
    let tempSpot = this._gameBoard.getSpotAt(Id);
    try {
@@ -392,6 +393,11 @@ class GameState {
      return false;
    }
  };
+
+  spotAt(Id){
+    return this._gameBoard.getSpotAt(Id);
+  };
+
  gameUpdate () {
    if(gameState.gameRunning){
      checkWin();
@@ -405,7 +411,7 @@ class GameState {
 // our game state
 const gameState = new GameState();
 // freeze its methods from being changed, prevent new methods or properties from being added.
-Object.freeze(gameState);
+//Object.freeze(gameState);
 
 
 ////////////////////////////////////////////////
@@ -435,6 +441,10 @@ class GameDOM {
     // Player score
     this._P1Name = document.querySelector('#P1');
     this._P2Name = document.querySelector('#P2');
+    // input counter
+    this._input = 0;
+    this._spotsSel=[];
+    this._possbSel=[];
     // init game State board
     gameState._gameBoard.setBoard(gameState._players[0]._pieces, gameState._players[1]._pieces);
 
@@ -461,31 +471,99 @@ class GameDOM {
   set boardAppend(value) {
     this._board.appendChild(value);
   }
+  set addSel(value) {
+    this._spotsSel.push(value);
+  }
+
+  set addPossb(value) {
+    this._possbSel.push(value);
+  }
+
+  get sel() {
+    return this._spotsSel;
+  }
+
+  get possb() {
+    return this._possbSel;
+  }
+
+  clearSel() {
+    for(let i = 0; i < this._spotsSel.length; i += 1) {
+      let spots = gameState.spotAt(this._spotsSel[i]);
+      //spots.removeAttribute('.highlight');
+      this._spotsSel.pop();
+    }
+  }
+
+  clearPossb() {
+    for(let i = 0; i < this._possbSel.length; i += 1) {
+      let spots = gameState.spotAt(this._possbSel[i]);
+      //spots.removeAttribute('.possible');
+      this._possbSel.pop();
+    }
+  }
 
   displayGame() {
-
     let spots = document.querySelectorAll('.spot');
     for(let i = 0 ; i < spots.length; i += 1){
       let spotId = spots[i].getAttribute('value');
       let sInfo = gameState.spotInfo(spotId);// = [ playerId, color]
-      debugger;
       if(sInfo)
       {
         let tempSpotDiv = document.createElement('div');
         tempSpotDiv.setAttribute('class',sInfo[1]);
-
+        tempSpotDiv.setAttribute('value',spotId);
         spots[i].innerHTML = '';
         spots[i].appendChild( tempSpotDiv);
-        console.log( tempSpotDiv);
       }
 
     }
 
   }
 
-  input() {
+  processInput () {
+    console.log(this._input);
+    switch(this._input)
+    {
+      case 1:
+      console.log('in case 1');
+        // do something
 
+        break;
+      case 2:
+      console.log('in case 2');
 
+        if(this.sel[0] != this.sel[1]) {
+          this.clearSel();
+          this.clearPossb();
+          gameState._p1Turn = !gameState._p1Turn;
+          this._input = 0;
+        }
+        else if(this.sel[0] == this.sel[1]) {
+          this.clearSel();
+          this.clearPossb();
+          this._input = 0;
+        }
+        break;
+    }
+  }
+
+  input(evt) {
+    let spotId = evt.target.getAttribute('value');
+    let sInfo = gameState.spotInfo(spotId); // = [ playerId, color]
+    debugger;
+    // if a piece is there plus the player is the owner
+    if( sInfo && (sInfo[0] == 1 && gameState._p1Turn)
+    || (sInfo[0] == 2 && !gameState._p1Turn) ) {
+      gameDOM.addSel = spotId;
+      console.log(evt.target);
+      evt.target.setAttribute('class', evt.target.getAttribute('class')
+      + ' highlight');
+      gameDOM._input = gameDOM._input + 1;
+    }
+
+    gameDOM.processInput();
+    gameDOM.displayGame();
   }
 
   createBoard() {
@@ -537,6 +615,7 @@ class GameDOM {
       }
       this.boardAppend = tmpRow;
     }
+    this._board.addEventListener('click', this.input);
     this.displayGame();
   }
 
@@ -554,7 +633,7 @@ const linkDOM = () => {
   gameDOM.loadElements();
   gameDOM.createBoard();
   // freeze its methods from being changed, prevent new methods or properties from being added.
-  Object.freeze(gameDOM);
+  //Object.freeze(gameDOM);
 }
 
 // if still loading

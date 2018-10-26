@@ -109,3 +109,5 @@ Log         | Task
 ----------- | ---------------------------------------------------------------
 Oct 24 2018 | fill out the jumps for each spot. Move pieces on board. jumping
 Oct 25 2018 | working on HTML and updating the DOM with game data.
+Oct 26 2018 | processing user input.
+codePen     | https://codepen.io/TARichardson/pen/pxGrpK?editors=1111
