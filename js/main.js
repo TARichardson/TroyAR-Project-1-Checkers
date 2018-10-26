@@ -487,23 +487,55 @@ class GameDOM {
     return this._possbSel;
   }
 
+  domGetCheckerAt(value) {
+    let checkers = document.querySelectorAll('.checker');
+    for(let i = 0 ; i < checkers.length; i += 1){
+      if(checkers[i].getAttribute('value') == value) {
+        return checkers[i];
+      }
+    }
+    return false;
+  }
+  domGetSpotAt(value) {
+    let spots = document.querySelectorAll('.spot');
+    for(let i = 0 ; i < spots.length; i += 1){
+      if(spots[i].getAttribute('value') == value) {
+        return spots[i];
+      }
+    }
+    return false;
+  }
   clearSel() {
     let spots = document.querySelectorAll('.highlight');
-    for(let i = 0; i < spots.length; i += 1) {
-      //spots.setAttribute(' highlight');
-      spots[i].setAttribute('class',
-               spots[i].getAttribute('class').replace(' highlight','') );
-      this._spotsSel.pop();
+    try {
+
+
+      for(let i = 0; i < this._input; i += 1) {
+        //spots.setAttribute(' highlight');
+        spots[i].setAttribute('class',
+                 spots[i].getAttribute('class').replace(' highlight','') );
+        this._spotsSel.shift();
+      }
+    }
+    catch
+    {
+      console.log("error in clearSel")
     }
   }
 
   clearPossb() {
     let spots = document.querySelectorAll('.possible');
-    for(let i = 0; i < spots.length; i += 1) {
-      //spots.setAttribute(' possible');
-      spots[i].setAttribute('class',
-               spots[i].getAttribute('class').replace(' possible','') );
-      this._possbSel.pop();
+    try {
+      for(let i = 0; i < spots.length; i += 1) {
+        //spots.setAttribute(' possible');
+        spots[i].setAttribute('class',
+                 spots[i].getAttribute('class').replace(' possible','') );
+        this._possbSel.shift();
+      }
+    }
+    catch
+    {
+      console.log("error in clearPossb")
     }
   }
 
@@ -515,7 +547,7 @@ class GameDOM {
       if(sInfo)
       {
         let tempSpotDiv = document.createElement('div');
-        tempSpotDiv.setAttribute('class',sInfo[1]);
+        tempSpotDiv.setAttribute('class',sInfo[1] + " checker");
         tempSpotDiv.setAttribute('value',spotId);
         spots[i].innerHTML = '';
         spots[i].appendChild( tempSpotDiv);
@@ -555,11 +587,22 @@ class GameDOM {
           this.displayGame();
         }
         else if(this.sel[0] == this.sel[1]) {
-          console.log('just deselect');
           debugger;
           this.clearSel();
           this.clearPossb();
-          this._input = 0;
+          if(this.sel.length) {
+            console.log('just deselect reselect element');
+
+            let checker = this.domGetCheckerAt(this.sel[0]);
+            checker.setAttribute('class', checker.getAttribute('class')
+            + ' highlight');
+            this._input = 1;
+          }
+          else {
+            console.log('just deselect');
+            this._input = 0;
+
+          }
         }
         break;
     }
@@ -578,8 +621,14 @@ class GameDOM {
     || (sInfo[0] == 2 && !gameState._p1Turn) ) {
       re = gameState._p1Turn ? /black/gi : /red/gi;
       found = spotClass.match(re);
-      if((found != null) && gameDOM._input == 0) {
+      // if((found != null) && gameDOM._input == 0) {
+      if( (found != null) ) {
 
+        // player picked his piece again we deselect
+        if(gameDOM._input == 1)
+        {
+          gameDOM.addSel = gameDOM.sel[0];
+        }
 
         gameDOM.addSel = spotId;
         console.log(evt.target);
