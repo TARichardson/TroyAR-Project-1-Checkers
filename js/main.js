@@ -196,7 +196,9 @@ class GameBoard {
                  let checkId2 = this._board[checkId[0]][checkId[1]].topSpots[i]
                  if(checkId2 != 'none') {
                    if(this._board[checkId2[0]][checkId2[1]].isEmpty) {
-                     tempArr.push(checkId2);
+                     tempArr.push([100,100]);
+                     tempArr[tempArr.length-1][0] = checkId2;
+                     tempArr[tempArr.length-1][1] = checkId;
                    }
                  }
             }
@@ -213,7 +215,9 @@ class GameBoard {
                  let checkId2 = this._board[checkId[0]][checkId[1]].bottomSpots[i]
                  if(checkId2 != 'none') {
                    if(this._board[checkId2[0]][checkId2[1]].isEmpty) {
-                     tempArr.push(checkId2);
+                     tempArr.push([100,100])
+                     tempArr[tempArr.length-1][0] = checkId2;
+                     tempArr[tempArr.length-1][1] = checkId;
                    }
                  }
             }
@@ -443,8 +447,9 @@ class GameDOM {
     this._P2Name = document.querySelector('#P2');
     // input counter
     this._input = 0;
-    this._spotsSel=[];
-    this._possbSel=[];
+    this._spotsSel = [];
+    this._possbSel = [];
+    this._toRemove = [];
     this._jumpMove= true; // jump = true move = false
     // init game State board
     gameState._gameBoard.setBoard(gameState._players[0]._pieces, gameState._players[1]._pieces);
@@ -474,7 +479,6 @@ class GameDOM {
   }
   set addSel(value) {
     let checker = this.domGetGet(value);
-    debugger;
     checker.setAttribute('class', checker.getAttribute('class')
     + ' highlight');
     this._spotsSel.push(value);
@@ -482,10 +486,13 @@ class GameDOM {
 
   set addPossb(value) {
     let checker = this.domGetGet(value);
-    debugger;
     checker.setAttribute('class', checker.getAttribute('class')
     + ' possible');
     this._possbSel.push(value);
+  }
+
+  set addRemove(value) {
+    this._toRemove.push(value);
   }
 
   get sel() {
@@ -494,6 +501,10 @@ class GameDOM {
 
   get possb() {
     return this._possbSel;
+  }
+
+  get Remo() {
+    return this._toRemove;
   }
 
   domGetCheckerAt(value) {
@@ -546,6 +557,12 @@ class GameDOM {
     }
   }
 
+  clearReMo() {
+    for(let i = 0; i < this._toRemove.length; i += 1) {
+      this._toRemove.shift();
+    }
+  }
+
   clearPossb() {
     let spots = document.querySelectorAll('.possible');
     try {
@@ -562,16 +579,32 @@ class GameDOM {
     }
   }
 
+
+
+  // to  remove at
+  // return index if in removble valid Array
+  //        false if not in reamovble Array
+  toRemoveAt(value) {
+
+      for(let i = 0 ; i < this._possbSel.length; i += 1){
+        if(value == this._possbSel[i]) {
+          return i;
+        }
+      }
+      return false;
+  }
+
   // is Possible
   // return true if in possible move Array
   //        false if not in possible move Array
   isPossb(value) {
-    for(let i = 0 ; i < this._possbSel.length; i += 1){
-      if(value == this._possbSel[i]) {
-        return true;
+
+      for(let i = 0 ; i < this._possbSel.length; i += 1){
+        if(value == this._possbSel[i]) {
+          return true;
+        }
       }
-    }
-    return false;
+      return false;
   }
 
   displayGame() {
@@ -614,10 +647,23 @@ class GameDOM {
           let spot = gameState._gameBoard.getSpotAt(this.sel[0]);
           let che;
           che = gameState._players[spot.checkerId[0] - 1]._pieces[spot.checkerId[1]];
-          let tmpArr = gameState._gameBoard.possibleMoves(che._id,che._direction,this.sel[0]);
-          for(let i = 0; i < tmpArr.length; i += 1) {
+          let tmpArr = [];
+          tmpArr =  gameState._gameBoard.possibleJumps(che._id,che._direction,this.sel[0]);
+          // debugger;
+          if(!tmpArr.length) {
+            this._jumpMove = false;
+            tmpArr = gameState._gameBoard.possibleMoves(che._id,che._direction,this.sel[0]);
+            for(let i = 0; i < tmpArr.length; i += 1) {
 
-            this.addPossb = tmpArr[i];
+              this.addPossb = tmpArr[i];
+            }
+          }
+          else{
+            for(let i = 0; i < tmpArr.length; i += 1) {
+
+              this.addPossb = tmpArr[i][0];
+              this.addRemove = tmpArr[i][1];
+            }
           }
         }
         break;
@@ -625,9 +671,11 @@ class GameDOM {
       console.log('in case 2');
 
         if(this.sel[0] != this.sel[1] && this.isPossb(this.sel[1])) {
-          console.log('move to a new spot');
+
           if(this._jumpMove) {
-            if(gameState._gameBoard.jumpTo(this.sel[0],this.sel[1],this.sel[2] )) {
+            debugger;
+            console.log('jump to a new spot');
+            if(gameState._gameBoard.jumpTo(this.sel[0],this.sel[1],this.Remo[ this.toRemoveAt(this.sel[1]) ])) {
 
               if(gameState._p1Turn){
                 gameState._players[0]._score += 1;
@@ -637,15 +685,29 @@ class GameDOM {
                 gameState._players[1]._score += 1;
                 console.log('player 2 scored a point');
               }
-            };
+            }
+            // do something
+            gameState._p1Turn = !gameState._p1Turn;
+            if(gameState._p1Turn){
+              console.log('player 1 turn');
+            }
+            else {
+              console.log('player 2 turn');
+            }
+            this._input = 0;
+
+            this.createBoard();
+            this.displayGame();
           }
           else {
+            console.log('move to a new spot');
             gameState._gameBoard.moveTo(this.sel[0],this.sel[1]);
             this._jumpMove = true;
           }
           debugger;
           this.clearSel();
           this.clearPossb();
+          this.clearReMo();
           gameState._p1Turn = !gameState._p1Turn;
           if(gameState._p1Turn){
             console.log('player 1 turn');
