@@ -105,6 +105,53 @@ This is a basic game of the checkers board game, American checkers. Using rules 
   }
 }
 ```
+## Last Input Refinement Goals.
+# Goal 1: 1st Selection
+- player should only be able to select there own checker piece.
+- process selection.
+-   - if valid highlight the Selection.
+-       * process possible moves/jumps.
+-       * highlight possible moves.
+-       * update display
+-       * transition to 2nd selection phase.
+-   - else invalid do nothing to selection.
+# Goal 2: 2nd Selection
+- player can select:
+-    1) possible jumps/moves.
+-    2) own/same checker piece.
+-  - if valid jump
+-     * player's checker move to new spot other player checker is removed from board.
+-     * update to player's pieces, king if needed
+-     * update to other player's pieces, remove it from play
+-     * update to player score
+-     * clear all 3 select lists
+-     * switch player turn
+-     * update display
+-     * transition to 1st selection phase.
+-  - else if valid moved
+-     * player's checker move to new spot
+-     * update to player's pieces, king if needed
+-     * clear all 3 select lists
+-     * switch player turn
+-     * update display
+-     * transition to 1st selection phase.
+-  - else if own checker piece.
+-     * clear all 3 select lists
+-     * force call to 1st selection phase.
+-  - else if same checker piece.
+-     * clear all 3 select lists
+-     * update display
+-     * transition to 1st selection phase.
+-   - else invalid do nothing to selection.
+# Goal 3: calling Functions
+- it's hard to debugger inline Functions call in inline function calls to get parameters
+-     * fix by store function parameters in variables before hand.
+-     * send in all parameters needed for the function.
+# Goal 4: clean up the code
+- for readability have function that do a lot more. then just get a value.
+- rename function that makes sense, even if the name is longer.
+
+
 Log         | Task
 ----------- | ---------------------------------------------------------------
 Oct 24 2018 | fill out the jumps for each spot. Move pieces on board. jumping
@@ -112,3 +159,5 @@ Oct 25 2018 | working on HTML and updating the DOM with game data.
 Oct 26 2018 | processing user input.
 codePen     | https://codepen.io/TARichardson/pen/pxGrpK?editors=1111
 codePen2    | https://codepen.io/TARichardson/pen/ePxezg?editors=1111
+proud of    | the highlighting
+Oct 27 2018 | refinement of the input system is need to stabilize the game.
