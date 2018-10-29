@@ -164,6 +164,27 @@ Oct 27 2018 | refinement of the input system is need to stabilize the game.
 Oct 28 2018 | finish MVP
 Oct 29 2018 | remove console.log() and committed code.
 
+## Constructor of a Singleton Class
+```javascript
+constructor(BoardSize){
+  // if there is no instance of class make one
+  if(!GameBoard._instance)
+  {
+    this._board = [];
+    for(let i = 0; i < BoardSize; i += 1){
+      let key = String.fromCharCode(utfA + i);
+      Object.defineProperty(this._board, key,
+        {
+      value: this.fillBoardSpots(i ,BoardSize),
+      writable: true
+      });
+    }
+    GameBoard._instance =  this;
+    Object.freeze(GameBoard._instance);
+  }
+  return GameBoard._instance;
+};
+```
 
 ## pics
 ![Image of game1](./media/game1.png)
