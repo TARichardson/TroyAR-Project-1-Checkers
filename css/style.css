@@ -11,42 +11,34 @@ main {
 
 #Lcol {
   grid-area: lcol;
-  /* border: red .1em solid; */
 
 }
 #Rcol {
   grid-area: rcol;
-  /* border: red .1em solid; */
 
 }
 header {
   grid-area: top;
-  /* border: red .1em solid; */
 
 }
 footer {
   grid-area: fot;
-  /* border: red .1em solid; */
 
 
 }
 #board {
     width: 500px;
     height: 500px;
-    /* border: red .1em solid; */
     display: flex;
     flex-direction: column;
     grid-area: bo;
 }
 
 .Row{
-  /* border: blue .1em solid; */
   display: flex;
   flex: auto;
-    /* width: 100em; */
   }
 .L, .spot, .lSpot{
-  /* border: green .1em solid; */
   flex: 30%;
 }
 .spot+.A:nth-child(odd), .B:nth-child(even),
@@ -54,7 +46,6 @@ footer {
 .spot+.E:nth-child(odd), .F:nth-child(even),
 .spot+.G:nth-child(odd), .H:nth-child(even){
   background-color: gray;
-  /* border: green .1em solid; */
 
 
 }
@@ -89,4 +80,23 @@ footer {
 
 .checker {
 
+}
+h1, #P1 {
+  position: relative;
+  left: 40%;
+}
+
+#P2 {
+  position: relative;
+  left: 0%;
+}
+
+#P1S, #P2S {
+  display: flex;
+}
+#itemP1Score, #itemP2Score {
+  flex: auto;
+}
+.PSNums {
+ flex: auto;
 }

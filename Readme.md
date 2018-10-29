@@ -162,3 +162,4 @@ codePen2    | https://codepen.io/TARichardson/pen/ePxezg?editors=1111
 proud of    | the highlighting
 Oct 27 2018 | refinement of the input system is need to stabilize the game.
 Oct 28 2018 | finish MVP
+Oct 29 2018 | remove console.log() and committed code.

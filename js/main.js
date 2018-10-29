@@ -56,7 +56,6 @@ class GameBoard {
       this._board = [];
       for(let i = 0; i < BoardSize; i += 1){
         let key = String.fromCharCode(utfA + i);
-        //let tempObj = Object.create(spot);
         Object.defineProperty(this._board, key,
           {
         value: this.fillBoardSpots(i ,BoardSize),
@@ -440,7 +439,6 @@ const gameState = new GameState();
 
 ////////////////////////////////////////////////
 ///////// View
-// tip use  "let src = elem.nodeValue;" research
 class GameDOM {
   constructor() {
     // if there is no instance of class make one
@@ -449,7 +447,6 @@ class GameDOM {
       this._body = document.body;
 
       GameDOM._instance =  this;
-      //Object.freeze(GameDOM._instance);
     }
     return GameDOM._instance;
   };
@@ -616,7 +613,6 @@ class GameDOM {
     let spots = document.querySelectorAll('.highlight');
     try {
       for(let i = 0; i < spots.length; i += 1) {
-        //spots.setAttribute(' highlight');
         spots[i].setAttribute('class',
                  spots[i].getAttribute('class').replace(' highlight','') );
       }
@@ -630,19 +626,15 @@ class GameDOM {
 
   clearRemove() {
     this._toRemove = [];
-    // for(let i = 0; i < this._toRemove.length; i += 1) {
-    //   this._toRemove.shift();
-    // }
+
   }
 
   clearPossible() {
     let spots = document.querySelectorAll('.possible');
     try {
       for(let i = 0; i < spots.length; i += 1) {
-        //spots.setAttribute(' possible');
         spots[i].setAttribute('class',
                  spots[i].getAttribute('class').replace(' possible','') );
-        //this._possbSel.shift();
       }
       this._possbSel = [];
     }
@@ -778,7 +770,6 @@ class GameDOM {
       this.addScore();
     }
   }
-  //   updatePlayerPiece (playerId, checkerId, direction, captured = false ,king = false)
 
   move() {
     let playerIndex = this.currentPlayerIndex;
@@ -800,7 +791,6 @@ class GameDOM {
       gameState.updatePlayerPiece(playerIndex,[this.getSelectionList[0],this.getSelectionList[1]],checkerInfo1[2]._direction,false,checkerInfo1[2]._king);
     }
     this._jumpMove = true;
-    //gameState.updatePlayerPiece();
   }
 
   processInput_2 () {
@@ -829,10 +819,8 @@ class GameDOM {
       let spot = gameState._gameBoard.getSpotAt(this.getSelectionList[0]);
       let checker;
       checker = gameState._players[spot.checkerId[0] - 1]._pieces[spot.checkerId[1]];
-      //debugger;
       let tmpArr = [];
       tmpArr =  gameState._gameBoard.possibleJumps(checker._id,checker._direction,this.getSelectionList[0]);
-      // debugger;
       // if empty
       if(!tmpArr.length) {
         this._jumpMove = false;
@@ -942,42 +930,6 @@ class GameDOM {
     } else {
       alert('There is a winner please refresh page the start again.');
     }
-    // // if a piece is there plus the player is the owner
-    // if( sInfo && (sInfo[0] == 1 && gameState._p1Turn)
-    // || (sInfo[0] == 2 && !gameState._p1Turn) ) {
-    //   re = gameState._p1Turn ? /black/gi : /red/gi;
-    //   found = spotClass.match(re);
-    //   // if((found != null) && gameDOM._input == 0) {
-    //   if( (found != null) ) {
-    //
-    //     // player picked his piece again we deselect
-    //     if(gameDOM._input == 1)
-    //     {
-    //       gameDOM.addSelection = gameDOM.getSelectionList[0];
-    //     }
-    //
-    //     gameDOM.addSelection = spotId;
-    //     console.log(evt.target);
-    //     // evt.target.setAttribute('class', evt.target.getAttribute('class')
-    //     // + ' highlight');
-    //     gameDOM.transitionState();
-    //   }
-    //
-    // }
-    // else if((found != null) && gameDOM._input == 1) { // it a spot
-    //   // todo : a check that checks the possible array
-    //   gameDOM.addSelection = spotId;
-    //   console.log(evt.target);
-    //   evt.target.setAttribute('class', evt.target.getAttribute('class')
-    //   + ' highlight');
-    //   gameDOM.transitionState();
-    //
-    // }
-    // else {
-    //   console.log('error');
-    // }
-    //
-    // gameDOM.processInput();
   }
 
   createBoard() {
@@ -1026,7 +978,6 @@ class GameDOM {
         tempSpotDiv.innerHTML = key + i;
         //////
         tmpRow.appendChild(tempSpotDiv);
-        //tempRowA.addEventListener('click', placeMark);
       }
       this.boardAppend = tmpRow;
     }
@@ -1050,8 +1001,6 @@ const gameDOM = new GameDOM();
 const linkDOM = () => {
   gameDOM.loadElements();
   gameDOM.createBoard();
-  // freeze its methods from being changed, prevent new methods or properties from being added.
-  //Object.freeze(gameDOM);
 }
 
 // if still loading
@@ -1061,7 +1010,3 @@ if(document.readyState == "loading") {
 else { // else it's already loaded
   linkDOM();
 }
-
-
-/////////////////////////////////////////////////
-////////// Control
