@@ -84,7 +84,7 @@ footer {
 .possible {
   width: inherit;
   height: inherit;
-  border: lightblue .1em solid;
+  border: darkblue .1em solid;
 }
 
 .checker {

@@ -192,7 +192,7 @@ class GameBoard {
           let checkId = this._board[fromLoc[0]][fromLoc[1]].topSpots[i]
           if(checkId != 'none') {
             if(!this._board[checkId[0]][checkId[1]].isEmpty
-               && id != this._board[checkId[0]][checkId[1]].checkerId) {
+               && id != this._board[checkId[0]][checkId[1]].checkerId[0]) {
                  let checkId2 = this._board[checkId[0]][checkId[1]].topSpots[i]
                  if(checkId2 != 'none') {
                    if(this._board[checkId2[0]][checkId2[1]].isEmpty) {
@@ -211,7 +211,7 @@ class GameBoard {
           let checkId = this._board[fromLoc[0]][fromLoc[1]].bottomSpots[i]
           if(checkId != 'none') {
             if(!this._board[checkId[0]][checkId[1]].isEmpty
-               && id != this._board[checkId[0]][checkId[1]].checkerId) {
+               && id != this._board[checkId[0]][checkId[1]].checkerId[0]) {
                  let checkId2 = this._board[checkId[0]][checkId[1]].bottomSpots[i]
                  if(checkId2 != 'none') {
                    if(this._board[checkId2[0]][checkId2[1]].isEmpty) {
@@ -382,6 +382,23 @@ class GameState {
 
   };
 
+
+  updatePlayerPiece(playerIndex, checkerId, direction, captured = false ,king = false) {
+    debugger;
+    let length = this._players[playerIndex]._pieces.length;
+    let pieces = this._players[playerIndex]._pieces;
+    for(let i = 0; i < length; i += 1) {
+      if(pieces[i]._location == checkerId[0])
+      {
+        this._players[playerIndex]._pieces[i]._location = checkerId[1];
+        this._players[playerIndex]._pieces[i]._direction = direction;
+        this._players[playerIndex]._pieces[i]._captured = captured;
+        this._players[playerIndex]._pieces[i]._king = king;
+        break;
+      }
+    }
+
+  }
   // Spot Info
   // return: Array
   //        = [ playerId, color]
@@ -391,6 +408,9 @@ class GameState {
    try {
      infoArr[0] = tempSpot.checkerId[0];
      infoArr[1] = this._players[ tempSpot.checkerId[0] -1]._color;
+     if(tempSpot.checkerId[1] > -1) {
+       infoArr[2] = this._players[tempSpot.checkerId[0] -1]._pieces[tempSpot.checkerId[1]];
+     }
      return infoArr;
    }
    catch {
@@ -445,17 +465,28 @@ class GameDOM {
     // Player score
     this._P1Name = document.querySelector('#P1');
     this._P2Name = document.querySelector('#P2');
-    // input counter
-    this._input = 0;
+    // input state
+    this._States = ['State_1_Selection', 'State_2_Selection'];
+    this._inputState = 0;
     this._spotsSel = [];
     this._possbSel = [];
     this._toRemove = [];
     this._jumpMove= true; // jump = true move = false
+    this._addListener = true;
     // init game State board
     gameState._gameBoard.setBoard(gameState._players[0]._pieces, gameState._players[1]._pieces);
 
   };
 
+  get inputState() {
+    return this._States[this._inputState];
+  }
+  transitionState() {
+    this._inputState++;
+    if(this._inputState >= this._States.length) {
+      this._inputState = 0;
+    }
+  }
   set p1Name(value) {
     this._P1Name = value;
   };
@@ -471,20 +502,62 @@ class GameDOM {
   set p2Score(value) {
     this._P2Score = value;
   };
+
+  addScore() {
+    if(gameState._p1Turn){
+      gameState._players[0]._score += 1;
+      console.log('player 1 scored a point');
+
+    }
+    else {
+      gameState._players[1]._score += 1;
+      console.log('player 2 scored a point');
+
+    }
+  }
+
+  checkWinner(){
+    let player = "";
+    if(gameState._players[0]._score >= maxPieces)
+    {
+      player = gameState._players[0]._name;
+      gameState._winner = true;
+    }
+    else if(gameState._players[1]._score >= maxPieces){
+      player = gameState._players[1]._name;
+      gameState._winner = true;
+    }
+    else {
+      return false;
+    }
+
+    return `${player} is the winner`;
+  }
+
+  switchTurns() {
+    gameState._p1Turn = !gameState._p1Turn;
+    if(gameState._p1Turn){
+      console.log('player 1 turn');
+    }
+    else {
+      console.log('player 2 turn');
+    }
+  }
+
   set boardInner(value) {
     this._board.innerHTML = value;
   }
   set boardAppend(value) {
     this._board.appendChild(value);
   }
-  set addSel(value) {
+  set addSelection(value) {
     let checker = this.domGetGet(value);
     checker.setAttribute('class', checker.getAttribute('class')
     + ' highlight');
     this._spotsSel.push(value);
   }
 
-  set addPossb(value) {
+  set addPossible(value) {
     let checker = this.domGetGet(value);
     checker.setAttribute('class', checker.getAttribute('class')
     + ' possible');
@@ -495,15 +568,15 @@ class GameDOM {
     this._toRemove.push(value);
   }
 
-  get sel() {
+  get getSelectionList() {
     return this._spotsSel;
   }
 
-  get possb() {
+  get getPossibleList() {
     return this._possbSel;
   }
 
-  get Remove() {
+  get getRemoveList() {
     return this._toRemove;
   }
 
@@ -539,15 +612,15 @@ class GameDOM {
     }
   }
 
-  clearSel() {
+  clearSelection() {
     let spots = document.querySelectorAll('.highlight');
     try {
       for(let i = 0; i < spots.length; i += 1) {
         //spots.setAttribute(' highlight');
         spots[i].setAttribute('class',
                  spots[i].getAttribute('class').replace(' highlight','') );
-        this._spotsSel.shift();
       }
+      this._spotsSel = [];
     }
     catch
     {
@@ -555,10 +628,11 @@ class GameDOM {
     }
   }
 
-  clearReMove() {
-    for(let i = 0; i < this._toRemove.length; i += 1) {
-      this._toRemove.shift();
-    }
+  clearRemove() {
+    this._toRemove = [];
+    // for(let i = 0; i < this._toRemove.length; i += 1) {
+    //   this._toRemove.shift();
+    // }
   }
 
   clearPossible() {
@@ -568,8 +642,9 @@ class GameDOM {
         //spots.setAttribute(' possible');
         spots[i].setAttribute('class',
                  spots[i].getAttribute('class').replace(' possible','') );
-        this._possbSel.shift();
+        //this._possbSel.shift();
       }
+      this._possbSel = [];
     }
     catch
     {
@@ -577,12 +652,17 @@ class GameDOM {
     }
   }
 
+  clearAllList(){
+    this.clearSelection();
+    this.clearPossible();
+    this.clearRemove();
+  }
 
 
   // to  remove at
   // return index if in removble valid Array
   //        false if not in reamovble Array
-  RemovAbleIndex(value) {
+  RemovableIndex(value) {
 
       for(let i = 0 ; i < this._possbSel.length; i += 1){
         if(value == this._possbSel[i]) {
@@ -630,156 +710,274 @@ class GameDOM {
     let play2 = document.querySelector('#P2');
     play1.innerHTML = gameState._players[0]._name;
     play2.innerHTML = gameState._players[1]._name;
-  }
-
-  processInput () {
-    console.log(this._input);
-    switch(this._input)
-    {
-      case 1:
-      console.log('in case 1');
-        // do something
-        if(!this.possb.length){
-          let spot = gameState._gameBoard.getSpotAt(this.sel[0]);
-          let che;
-          che = gameState._players[spot.checkerId[0] - 1]._pieces[spot.checkerId[1]];
-          let tmpArr = [];
-          tmpArr =  gameState._gameBoard.possibleJumps(che._id,che._direction,this.sel[0]);
-          // debugger;
-          if(!tmpArr.length) {
-            this._jumpMove = false;
-            tmpArr = gameState._gameBoard.possibleMoves(che._id,che._direction,this.sel[0]);
-            for(let i = 0; i < tmpArr.length; i += 1) {
-
-              this.addPossb = tmpArr[i];
-            }
-          }
-          else{
-            for(let i = 0; i < tmpArr.length; i += 1) {
-
-              this.addPossb = tmpArr[i][0];
-              this.addRemove = tmpArr[i][1];
-            }
-          }
-        }
-        break;
-      case 2:
-      console.log('in case 2');
-
-        if(this.sel[0] != this.sel[1] && this.isPossible(this.sel[1])) {
-
-          if(this._jumpMove) {
-            debugger;
-            console.log('jump to a new spot');
-            let toRemove = this.Remove[ this.toRemoveAt(this.sel[1]) ];
-            if(gameState._gameBoard.jumpTo(this.sel[0],this.sel[1],toRemove)) {
-
-              if(gameState._p1Turn){
-                gameState._players[0]._score += 1;
-                console.log('player 1 scored a point');
-              }
-              else {
-                gameState._players[1]._score += 1;
-                console.log('player 2 scored a point');
-              }
-            }
-            // do something
-            gameState._p1Turn = !gameState._p1Turn;
-            if(gameState._p1Turn){
-              console.log('player 1 turn');
-            }
-            else {
-              console.log('player 2 turn');
-            }
-            this._input = 0;
-
-            this.createBoard();
-          }
-          else {
-            console.log('move to a new spot');
-            gameState._gameBoard.moveTo(this.sel[0],this.sel[1]);
-            this._jumpMove = true;
-          }
-          debugger;
-          this.clearSel();
-          this.clearPossible();
-          this.clearReMove();
-          gameState._p1Turn = !gameState._p1Turn;
-          if(gameState._p1Turn){
-            console.log('player 1 turn');
-          }
-          else {
-            console.log('player 2 turn');
-          }
-          this._input = 0;
-          this.createBoard();
-        }
-        else if(this.sel[0] == this.sel[1]) {
-          this.clearSel();
-          this.clearPossible();
-          if(this.sel.length) {
-            console.log('just deselect reselect element');
-
-            // let checker = this.domGetCheckerAt(this.sel[0]);
-            // checker.setAttribute('class', checker.getAttribute('class')
-            // + ' highlight');
-            this._input = 1;
-            // to update Possb array
-            debugger;
-            this.processInput();
-          }
-          else {
-            console.log('just deselect');
-            this._input = 0;
-
-          }
-        }
-        break;
+    let message = this.checkWinner();
+    if(message) {
+      alert(message);
     }
   }
+  // # Goal 2: 2nd Selection
+  // - player can select:
+  // -    1) possible jumps/moves.
+  // -    2) own/same checker piece.
+  // -  - if valid jump
+  // -     * player's checker move to new spot other player checker is removed from board.
+  // -     * update to player's pieces, king if needed
+  // -     * update to other player's pieces, remove it from play
+  // -     * update to player score
+  // -     * clear all 3 select lists
+  // -     * switch player turn
+  // -     * update display
+  // -     * transition to 1st selection phase.
+  // -  - else if valid moved
+  // -     * player's checker move to new spot
+  // -     * update to player's pieces, king if needed
+  // -     * clear all 3 select lists
+  // -     * switch player turn
+  // -     * update display
+  // -     * transition to 1st selection phase.
+  // -  - else if own checker piece.
+  // -     * clear all 3 select lists
+  // -     * force call to 1st selection phase.
+  // -  - else if same checker piece.
+  // -     * clear all 3 select lists
+  // -     * update display
+  // -     * transition to 1st selection phase.
+  // -   - else invalid do nothing to selection.
+  get currentPlayerIndex() {
+    return gameState._p1Turn ? 0 : 1;
+  }
 
-  input(evt) {
-    let spotId = evt.target.getAttribute('value');
-    let sInfo = gameState.spotInfo(spotId); // = [ playerId, color]
-    let spotClass = evt.target.getAttribute('class');
-    let re = /spot/gi;
-    let found = spotClass.match(re);
+  get otherPlayerIndex() {
+    return gameState._p1Turn ? 1 : 0;
+  }
 
-    // if a piece is there plus the player is the owner
-    if( sInfo && (sInfo[0] == 1 && gameState._p1Turn)
-    || (sInfo[0] == 2 && !gameState._p1Turn) ) {
-      re = gameState._p1Turn ? /black/gi : /red/gi;
-      found = spotClass.match(re);
-      // if((found != null) && gameDOM._input == 0) {
-      if( (found != null) ) {
+  jump() {
+    let toRemove = this.getRemoveList[ this.RemovableIndex(this.getSelectionList[1]) ];
+    let playerIndex = this.currentPlayerIndex;
+    let otherPlayerIndex = this.otherPlayerIndex;
+    let checkerInfo1 = gameState.spotInfo(this.getSelectionList[0]);
+    let checkerInfo2 = gameState.spotInfo(toRemove);
+    let reA = /A/gi;
+    let reH = /H/gi;
+    let spotInfo1 = this.domGetSpotAt(this.getSelectionList[1]);
+    let spotId = spotInfo1.getAttribute('value');
+    let foundA = spotId.match(reA);;
+    let foundH = spotId.match(reH);;
 
-        // player picked his piece again we deselect
-        if(gameDOM._input == 1)
-        {
-          gameDOM.addSel = gameDOM.sel[0];
-        }
-
-        gameDOM.addSel = spotId;
-        console.log(evt.target);
-        // evt.target.setAttribute('class', evt.target.getAttribute('class')
-        // + ' highlight');
-        gameDOM._input = gameDOM._input + 1;
+    debugger;
+    if(gameState._gameBoard.jumpTo(this.getSelectionList[0],this.getSelectionList[1],toRemove)) {
+      // update move
+      if(foundA != null || foundH != null ) {
+        gameState.updatePlayerPiece(playerIndex,[this.getSelectionList[0],this.getSelectionList[1]],moveBoth,false,true);
       }
-
+      else {
+        gameState.updatePlayerPiece(playerIndex,[this.getSelectionList[0],this.getSelectionList[1]],checkerInfo1[2]._direction,false,checkerInfo1[2]._king);
+      }
+      // remove piece
+      gameState.updatePlayerPiece(otherPlayerIndex,[toRemove,toRemove],checkerInfo2[2]._direction,true,checkerInfo2[2]._king);
+      this.addScore();
     }
-    else if((found != null) && gameDOM._input == 1) { // it a spot
-      // todo : a check that checks the possible array
-      gameDOM.addSel = spotId;
-      console.log(evt.target);
-      evt.target.setAttribute('class', evt.target.getAttribute('class')
-      + ' highlight');
-      gameDOM._input = gameDOM._input + 1;
+  }
+  //   updatePlayerPiece (playerId, checkerId, direction, captured = false ,king = false)
+
+  move() {
+    let playerIndex = this.currentPlayerIndex;
+    let checkerInfo1 = gameState.spotInfo(this.getSelectionList[0]);
+    let reA = /A/gi;
+    let reH = /H/gi;
+    let spotInfo1 = this.domGetSpotAt(this.getSelectionList[1]);
+    let spotId = spotInfo1.getAttribute('value');
+    let foundA = spotId.match(reA);;
+    let foundH = spotId.match(reH);;
+
+    gameState._gameBoard.moveTo(this.getSelectionList[0],this.getSelectionList[1]);
+
+    debugger;
+    if(foundA != null || foundH != null) {
+      gameState.updatePlayerPiece(playerIndex,[this.getSelectionList[0],this.getSelectionList[1]],moveBoth,false,true);
     }
     else {
-      console.log('error');
+      gameState.updatePlayerPiece(playerIndex,[this.getSelectionList[0],this.getSelectionList[1]],checkerInfo1[2]._direction,false,checkerInfo1[2]._king);
+    }
+    this._jumpMove = true;
+    //gameState.updatePlayerPiece();
+  }
+
+  processInput_2 () {
+    console.log('in case 2');
+
+    if(this._jumpMove) {
+      console.log('jump to a new spot');
+      this.jump();
+
+    }
+    else {
+      console.log('move to a new spot');
+      this.move();
     }
 
-    gameDOM.processInput();
+    this.clearAllList();
+    this.switchTurns();
+    this.createBoard();
+    this.transitionState();
+    }
+
+  processInput_1 () {
+    // if empty
+    if(!this.getPossibleList.length) {
+
+      let spot = gameState._gameBoard.getSpotAt(this.getSelectionList[0]);
+      let checker;
+      checker = gameState._players[spot.checkerId[0] - 1]._pieces[spot.checkerId[1]];
+      //debugger;
+      let tmpArr = [];
+      tmpArr =  gameState._gameBoard.possibleJumps(checker._id,checker._direction,this.getSelectionList[0]);
+      // debugger;
+      // if empty
+      if(!tmpArr.length) {
+        this._jumpMove = false;
+        tmpArr = gameState._gameBoard.possibleMoves(checker._id,checker._direction,this.getSelectionList[0]);
+        for(let i = 0; i < tmpArr.length; i += 1) {
+
+          this.addPossible = tmpArr[i];
+        }
+      }
+      else {
+        for(let i = 0; i < tmpArr.length; i += 1) {
+
+          this.addPossible = tmpArr[i][0];
+          this.addRemove = tmpArr[i][1];
+        }
+      }
+    }
+  }
+
+
+  myCheckerPiece(sInfo, spotClass){
+    // if a piece is there plus the player is the owner
+    let found;
+    let re = gameState._p1Turn ? /black/gi : /red/gi;
+    if(gameState._p1Turn && (sInfo && (sInfo[0] == 1))) {
+        found = spotClass.match(re);
+        if( (found != null) ) {
+          return true;
+        }
+    }
+    else if( sInfo && (sInfo[0] == 2 )) {
+      found = spotClass.match(re);
+      if( (found != null) ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  validSpot(){
+    if(found != null) {
+
+    }
+
+  }
+  //
+  // ## Last Input Refinement Goals.
+  // # Goal 1: 1st Selection
+  // - player should only be able to select there own checker piece.
+  // - process selection.
+  // -   - if valid highlight the Selection.
+  // -       * process possible moves/jumps.
+  // -       * highlight possible moves.
+  // -       * update display
+  // -       * transition to 2nd selection phase.
+  // -   - else invalid do nothing to selection.
+  input(evt) {
+    if(!GameState._winner) {
+      let spotId = evt.target.getAttribute('value');
+      let spotClass = evt.target.getAttribute('class');
+      let sInfo = gameState.spotInfo(spotId); // = [ playerId, color]
+      let re = /spot/gi;
+      let found = spotClass.match(re);
+      debugger;
+      switch (gameDOM.inputState) {
+        case 'State_1_Selection':
+            if(gameDOM.myCheckerPiece(sInfo, spotClass)){
+              gameDOM.addSelection = spotId;
+              console.log(evt.target);
+              gameDOM.processInput_1();
+              gameDOM.transitionState();
+            }
+          break;
+          case 'State_2_Selection':
+          // own/same checker piece.
+          if(gameDOM.myCheckerPiece(sInfo, spotClass)){
+            // same checker piece.
+            // -     * clear all 3 select lists
+            // -     * update display
+            // -     * transition to 1st selection phase.
+            if(gameDOM.getSelectionList[0] == spotId) {
+              gameDOM.clearAllList();
+              gameDOM.transitionState();
+            }
+            // -  - else if own checker piece.
+            // -     * clear all 3 select lists
+            // -     * force call to 1st selection phase.
+            else {
+              gameDOM.clearAllList();
+              gameDOM.transitionState();
+              gameDOM.input(evt);
+
+            }
+          }
+          else if (gameDOM.getPossibleList.length < 1) {
+            break;
+          }
+          // if its a spot
+          else if(found != null){
+            if( gameDOM.isPossible(spotId) ) {
+              gameDOM.addSelection = spotId;
+              gameDOM.processInput_2();
+            }
+          }
+          break;
+      }
+    } else {
+      alert('There is a winner please refresh page the start again.');
+    }
+    // // if a piece is there plus the player is the owner
+    // if( sInfo && (sInfo[0] == 1 && gameState._p1Turn)
+    // || (sInfo[0] == 2 && !gameState._p1Turn) ) {
+    //   re = gameState._p1Turn ? /black/gi : /red/gi;
+    //   found = spotClass.match(re);
+    //   // if((found != null) && gameDOM._input == 0) {
+    //   if( (found != null) ) {
+    //
+    //     // player picked his piece again we deselect
+    //     if(gameDOM._input == 1)
+    //     {
+    //       gameDOM.addSelection = gameDOM.getSelectionList[0];
+    //     }
+    //
+    //     gameDOM.addSelection = spotId;
+    //     console.log(evt.target);
+    //     // evt.target.setAttribute('class', evt.target.getAttribute('class')
+    //     // + ' highlight');
+    //     gameDOM.transitionState();
+    //   }
+    //
+    // }
+    // else if((found != null) && gameDOM._input == 1) { // it a spot
+    //   // todo : a check that checks the possible array
+    //   gameDOM.addSelection = spotId;
+    //   console.log(evt.target);
+    //   evt.target.setAttribute('class', evt.target.getAttribute('class')
+    //   + ' highlight');
+    //   gameDOM.transitionState();
+    //
+    // }
+    // else {
+    //   console.log('error');
+    // }
+    //
+    // gameDOM.processInput();
   }
 
   createBoard() {
@@ -832,7 +1030,10 @@ class GameDOM {
       }
       this.boardAppend = tmpRow;
     }
-    this._board.addEventListener('click', this.input);
+    if(this._addListener) {
+      this._addListener = false;
+      this._board.addEventListener('click', this.input);
+    }
     this.displayGameState();
   }
 

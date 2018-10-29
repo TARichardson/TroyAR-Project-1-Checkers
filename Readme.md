@@ -161,3 +161,4 @@ codePen     | https://codepen.io/TARichardson/pen/pxGrpK?editors=1111
 codePen2    | https://codepen.io/TARichardson/pen/ePxezg?editors=1111
 proud of    | the highlighting
 Oct 27 2018 | refinement of the input system is need to stabilize the game.
+Oct 28 2018 | finish MVP
