@@ -163,3 +163,8 @@ proud of    | the highlighting
 Oct 27 2018 | refinement of the input system is need to stabilize the game.
 Oct 28 2018 | finish MVP
 Oct 29 2018 | remove console.log() and committed code.
+
+
+## pics
+![Image of game1](./media/game1.png)
+![Image of game2](./media/game2.png)

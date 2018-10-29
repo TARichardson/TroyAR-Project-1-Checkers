@@ -81,6 +81,7 @@ footer {
 .checker {
 
 }
+
 h1, #P1 {
   position: relative;
   left: 40%;
@@ -94,9 +95,19 @@ h1, #P1 {
 #P1S, #P2S {
   display: flex;
 }
+
 #itemP1Score, #itemP2Score {
   flex: auto;
 }
+
 .PSNums {
  flex: auto;
+}
+
+.GoldName {
+  color: gold;
+}
+
+.king:hover {
+  background-color: gold;
 }

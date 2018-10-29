@@ -758,6 +758,7 @@ class GameDOM {
 
     debugger;
     if(gameState._gameBoard.jumpTo(this.getSelectionList[0],this.getSelectionList[1],toRemove)) {
+      debugger;
       // update move
       if(foundA != null || foundH != null ) {
         gameState.updatePlayerPiece(playerIndex,[this.getSelectionList[0],this.getSelectionList[1]],moveBoth,false,true);
