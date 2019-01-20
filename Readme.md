@@ -3,10 +3,20 @@
 _Introduction_
 This is a basic game of the checkers board game, American checkers. Using rules from the website https://www.itsyourturn.com/t_helptopic2030.html. Tutorial Section:
 
+
+## Deployment
+  * glistening-apples.surge.sh
+
+## Technologies to be used:
+  * HTML
+  * CSS
+  * JavaScript
+
 ## Project Risks.
   - The jumping the opponent.
   - The Crowning the the checker.
   - Multi-jumps.
+  
 ## solving.
   - Depending on the direction the piece is going the location on the board will hold possibles jumps from that spot.
   - The crowned checker piece will need to move in both direction. I will store a bool to let the move logic know to let the crowned piece move and jump in both direction.

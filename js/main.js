@@ -47,7 +47,6 @@ const spot = { // object template
   bottomSpots: []
 };
 
-
 class GameBoard {
   constructor(BoardSize){
     // if there is no instance of class make one
